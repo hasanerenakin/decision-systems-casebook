@@ -1,0 +1,568 @@
+openapi: 3.0.3
+
+info:
+  title: Campus Shuttle Decision System API
+  version: 1.0.0
+  description: >
+    API contract for accessing route performance, operational
+    recommendations and human review decisions in the Campus Shuttle
+    Decision System.
+
+servers:
+  - url: https://api.example-university.edu/shuttle/v1
+    description: Example production environment
+
+tags:
+  - name: Routes
+    description: Route performance and operational information
+  - name: Recommendations
+    description: System-generated operational recommendations
+  - name: Decisions
+    description: Human review and approval operations
+
+paths:
+  /routes/{routeId}/performance:
+    get:
+      tags:
+        - Routes
+      summary: Get route performance
+      description: >
+        Returns utilization, delay and service reliability metrics for a
+        selected route and date range.
+      operationId: getRoutePerformance
+
+      parameters:
+        - name: routeId
+          in: path
+          required: true
+          description: Unique identifier of the route
+          schema:
+            type: string
+          example: ROUTE-A
+
+        - name: startDate
+          in: query
+          required: true
+          description: Beginning of the performance period
+          schema:
+            type: string
+            format: date
+          example: 2026-07-01
+
+        - name: endDate
+          in: query
+          required: true
+          description: End of the performance period
+          schema:
+            type: string
+            format: date
+          example: 2026-07-31
+
+        - name: timeSlot
+          in: query
+          required: false
+          description: Optional time-slot filter
+          schema:
+            type: string
+          example: 08:00-09:00
+
+      responses:
+        "200":
+          description: Route performance returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoutePerformance"
+
+        "400":
+          description: Invalid date range or request parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Route not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /recommendations:
+    get:
+      tags:
+        - Recommendations
+      summary: List operational recommendations
+      description: >
+        Returns recommendations generated from route utilization, delays
+        and other operational measurements.
+      operationId: listRecommendations
+
+      parameters:
+        - name: routeId
+          in: query
+          required: false
+          description: Filter recommendations by route
+          schema:
+            type: string
+          example: ROUTE-A
+
+        - name: status
+          in: query
+          required: false
+          description: Filter recommendations by review status
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - rejected
+              - expired
+
+        - name: recommendationType
+          in: query
+          required: false
+          description: Filter recommendations by action type
+          schema:
+            type: string
+            enum:
+              - add_vehicle
+              - reduce_frequency
+              - revise_schedule
+              - investigate_delay
+
+        - name: page
+          in: query
+          required: false
+          description: Requested result page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+
+        - name: pageSize
+          in: query
+          required: false
+          description: Number of records per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+
+      responses:
+        "200":
+          description: Recommendations returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - pagination
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Recommendation"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+
+  /recommendations/{recommendationId}:
+    get:
+      tags:
+        - Recommendations
+      summary: Get recommendation details
+      description: >
+        Returns a recommendation together with the measurements and
+        business rules supporting it.
+      operationId: getRecommendation
+
+      parameters:
+        - name: recommendationId
+          in: path
+          required: true
+          description: Unique recommendation identifier
+          schema:
+            type: string
+          example: REC-2026-0042
+
+      responses:
+        "200":
+          description: Recommendation returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationDetail"
+
+        "404":
+          description: Recommendation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /recommendations/{recommendationId}/decision:
+    post:
+      tags:
+        - Decisions
+      summary: Submit a recommendation decision
+      description: >
+        Allows an authorized operations manager to approve or reject a
+        pending recommendation.
+      operationId: createRecommendationDecision
+
+      parameters:
+        - name: recommendationId
+          in: path
+          required: true
+          description: Unique recommendation identifier
+          schema:
+            type: string
+          example: REC-2026-0042
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DecisionRequest"
+            example:
+              decisionStatus: approved
+              decisionReason: >
+                Morning utilization has exceeded the accepted threshold
+                for five consecutive operating days.
+              implementationDate: 2026-08-10
+
+      responses:
+        "201":
+          description: Decision recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationDecision"
+
+        "400":
+          description: Invalid decision request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Recommendation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "409":
+          description: Recommendation has already been reviewed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    RoutePerformance:
+      type: object
+      required:
+        - routeId
+        - period
+        - totalTrips
+        - averageUtilizationRate
+        - onTimePerformanceRate
+      properties:
+        routeId:
+          type: string
+          example: ROUTE-A
+
+        routeName:
+          type: string
+          example: Central Campus - Student Dormitories
+
+        period:
+          type: object
+          required:
+            - startDate
+            - endDate
+          properties:
+            startDate:
+              type: string
+              format: date
+              example: 2026-07-01
+            endDate:
+              type: string
+              format: date
+              example: 2026-07-31
+
+        totalTrips:
+          type: integer
+          example: 186
+
+        completedTrips:
+          type: integer
+          example: 179
+
+        cancelledTrips:
+          type: integer
+          example: 7
+
+        averageUtilizationRate:
+          type: number
+          format: double
+          description: Average percentage of usable vehicle capacity
+          example: 87.4
+
+        peakUtilizationRate:
+          type: number
+          format: double
+          example: 103.2
+
+        averageDelayMinutes:
+          type: number
+          format: double
+          example: 8.6
+
+        onTimePerformanceRate:
+          type: number
+          format: double
+          description: Percentage of trips arriving within the accepted limit
+          example: 76.5
+
+        overcrowdedTripCount:
+          type: integer
+          example: 24
+
+        activeRecommendationCount:
+          type: integer
+          example: 2
+
+    Recommendation:
+      type: object
+      required:
+        - recommendationId
+        - routeId
+        - recommendationType
+        - triggeringRule
+        - status
+        - generatedAt
+      properties:
+        recommendationId:
+          type: string
+          example: REC-2026-0042
+
+        routeId:
+          type: string
+          example: ROUTE-A
+
+        recommendationType:
+          type: string
+          enum:
+            - add_vehicle
+            - reduce_frequency
+            - revise_schedule
+            - investigate_delay
+          example: add_vehicle
+
+        targetTimeSlot:
+          type: string
+          example: 08:00-09:00
+
+        triggeringRule:
+          type: string
+          example: BR-002
+
+        confidenceLevel:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          example: 0.91
+
+        expectedEffect:
+          type: string
+          example: >
+            Reduce average peak-hour utilization from 102 percent to
+            approximately 82 percent.
+
+        status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - rejected
+            - expired
+          example: pending
+
+        generatedAt:
+          type: string
+          format: date-time
+          example: 2026-07-31T09:30:00Z
+
+    RecommendationDetail:
+      allOf:
+        - $ref: "#/components/schemas/Recommendation"
+        - type: object
+          properties:
+            explanation:
+              type: string
+              example: >
+                Route A exceeded 95 percent utilization during five
+                comparable morning trips within seven days.
+
+            evidence:
+              type: array
+              items:
+                $ref: "#/components/schemas/RecommendationEvidence"
+
+            decision:
+              nullable: true
+              allOf:
+                - $ref: "#/components/schemas/RecommendationDecision"
+
+    RecommendationEvidence:
+      type: object
+      required:
+        - metricName
+        - metricValue
+        - thresholdValue
+      properties:
+        tripId:
+          type: string
+          example: TRIP-2026-0718-0815
+
+        metricName:
+          type: string
+          example: utilization_rate
+
+        metricValue:
+          type: number
+          format: double
+          example: 101.8
+
+        thresholdValue:
+          type: number
+          format: double
+          example: 95
+
+        evidencePeriod:
+          type: string
+          example: 2026-07-24 to 2026-07-30
+
+    DecisionRequest:
+      type: object
+      required:
+        - decisionStatus
+        - decisionReason
+      properties:
+        decisionStatus:
+          type: string
+          enum:
+            - approved
+            - rejected
+
+        decisionReason:
+          type: string
+          minLength: 10
+          maxLength: 1000
+
+        implementationDate:
+          type: string
+          format: date
+          nullable: true
+
+    RecommendationDecision:
+      type: object
+      required:
+        - decisionId
+        - recommendationId
+        - decisionStatus
+        - decisionReason
+        - decidedBy
+        - decidedAt
+      properties:
+        decisionId:
+          type: string
+          example: DEC-2026-0018
+
+        recommendationId:
+          type: string
+          example: REC-2026-0042
+
+        decisionStatus:
+          type: string
+          enum:
+            - approved
+            - rejected
+          example: approved
+
+        decisionReason:
+          type: string
+          example: >
+            The recommendation is supported by repeated capacity problems
+            during the morning service period.
+
+        decidedBy:
+          type: string
+          example: operations.manager@example-university.edu
+
+        decidedAt:
+          type: string
+          format: date-time
+          example: 2026-08-01T11:15:00Z
+
+        implementationDate:
+          type: string
+          format: date
+          nullable: true
+          example: 2026-08-10
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - pageSize
+        - totalItems
+        - totalPages
+      properties:
+        page:
+          type: integer
+          example: 1
+
+        pageSize:
+          type: integer
+          example: 20
+
+        totalItems:
+          type: integer
+          example: 43
+
+        totalPages:
+          type: integer
+          example: 3
+
+    ErrorResponse:
+      type: object
+      required:
+        - errorCode
+        - message
+        - timestamp
+      properties:
+        errorCode:
+          type: string
+          example: ROUTE_NOT_FOUND
+
+        message:
+          type: string
+          example: No active route was found for the supplied identifier.
+
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-07-31T12:45:00Z
+
+        traceId:
+          type: string
+          example: 13a947b0-2d76-4b45-8df4-1d3f09fb91b8
