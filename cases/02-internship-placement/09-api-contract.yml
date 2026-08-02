@@ -1,0 +1,4879 @@
+openapi: 3.0.3
+
+info:
+  title: Internship Placement and Matching API
+  version: 1.0.0
+  description: |
+    API contract for an explainable university internship placement and
+    matching system.
+
+    The API supports:
+
+    - Student profiles and preferences
+    - Academic eligibility evaluations
+    - Employer registration and verification
+    - Internship opportunity management
+    - Structured opportunity requirements
+    - Internship applications
+    - Requirement and compatibility evaluations
+    - Explainable placement recommendations
+    - Human review and manual overrides
+    - Placement offers and capacity reservations
+    - Final placement confirmation
+    - Internship outcomes
+    - Unplaced-student intervention cases
+
+    The API represents a system-design case study rather than a deployed
+    production service.
+
+    Placement recommendations are advisory. Final placement confirmation
+    requires authorized human review and the required student, employer,
+    academic and career-center decisions.
+
+  contact:
+    name: Decision Systems Casebook
+  license:
+    name: Portfolio Case Study
+
+servers:
+  - url: https://api.example-university.edu/internship-placement/v1
+    description: Example production server
+  - url: https://sandbox.example-university.edu/internship-placement/v1
+    description: Example sandbox server
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Students
+    description: Student profile, skills and preference operations
+  - name: Eligibility
+    description: Academic eligibility evaluation and exception operations
+  - name: Employers
+    description: Employer registration, verification and status operations
+  - name: Opportunities
+    description: Internship opportunity and requirement operations
+  - name: Applications
+    description: Internship application lifecycle operations
+  - name: Matching
+    description: Requirement evaluation and compatibility operations
+  - name: Recommendations
+    description: Explainable placement recommendation operations
+  - name: Decisions
+    description: Authorized human review and override operations
+  - name: Offers
+    description: Placement offer and capacity-reservation operations
+  - name: Placements
+    description: Final placement and cancellation operations
+  - name: Outcomes
+    description: Internship completion and evaluation operations
+  - name: Interventions
+    description: Unplaced-student intervention operations
+
+paths:
+  /students/{studentId}:
+    get:
+      tags:
+        - Students
+      summary: Get student placement profile
+      description: |
+        Returns the authorized internship-placement view of a student.
+
+        Academic information may be retrieved from an authoritative university
+        source and is not directly editable by the student.
+      operationId: getStudent
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Student profile returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /students/{studentId}/profile:
+    get:
+      tags:
+        - Students
+      summary: Get student-editable profile
+      operationId: getStudentProfile
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Student profile returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentProfile"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags:
+        - Students
+      summary: Update student-editable profile
+      description: |
+        Updates fields that the student or authorized career-center role may
+        maintain.
+
+        Authoritative academic information cannot be modified through this
+        operation.
+      operationId: updateStudentProfile
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentProfileUpdateRequest"
+      responses:
+        "200":
+          description: Student profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "412":
+          $ref: "#/components/responses/PreconditionFailed"
+
+  /students/{studentId}/skills:
+    get:
+      tags:
+        - Students
+      summary: List student skills
+      operationId: listStudentSkills
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Student skills returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentSkill"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags:
+        - Students
+      summary: Add student skill
+      operationId: createStudentSkill
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentSkillCreateRequest"
+      responses:
+        "201":
+          description: Student skill created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentSkill"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /students/{studentId}/preferences:
+    get:
+      tags:
+        - Students
+      summary: List active student preferences
+      operationId: listStudentPreferences
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "200":
+          description: Student preferences returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentPreference"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Students
+      summary: Replace active student preferences
+      description: |
+        Creates a new version of the student's active preference set.
+
+        Historical recommendations continue to reference the preference
+        version used when they were generated.
+      operationId: replaceStudentPreferences
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentPreferenceSetRequest"
+      responses:
+        "200":
+          description: Preference version created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentPreferenceSet"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "412":
+          $ref: "#/components/responses/PreconditionFailed"
+
+  /students/{studentId}/eligibility-evaluations:
+    get:
+      tags:
+        - Eligibility
+      summary: List academic eligibility evaluations
+      operationId: listEligibilityEvaluations
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+        - $ref: "#/components/parameters/PlacementCycleIdQuery"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Eligibility evaluations returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityEvaluationPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags:
+        - Eligibility
+      summary: Evaluate academic eligibility
+      description: |
+        Evaluates a student against the active institution-level and
+        department-specific academic rules for a placement cycle.
+      operationId: createEligibilityEvaluation
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EligibilityEvaluationRequest"
+      responses:
+        "201":
+          description: Eligibility evaluation created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityEvaluation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /eligibility-evaluations/{evaluationId}:
+    get:
+      tags:
+        - Eligibility
+      summary: Get academic eligibility evaluation
+      operationId: getEligibilityEvaluation
+      parameters:
+        - $ref: "#/components/parameters/EvaluationId"
+      responses:
+        "200":
+          description: Eligibility evaluation returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityEvaluation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /eligibility-evaluations/{evaluationId}/exceptions:
+    post:
+      tags:
+        - Eligibility
+      summary: Create academic exception request
+      description: |
+        Creates a request for an authorized academic role to review a
+        permitted exception.
+
+        Creating the request does not approve the exception.
+      operationId: createAcademicExceptionRequest
+      parameters:
+        - $ref: "#/components/parameters/EvaluationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcademicExceptionCreateRequest"
+      responses:
+        "201":
+          description: Academic exception request created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademicException"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /academic-exceptions/{exceptionId}/decision:
+    post:
+      tags:
+        - Eligibility
+      summary: Decide academic exception request
+      description: |
+        Approves or rejects an academic exception request.
+
+        Only an authorized academic role may approve an academic exception.
+      operationId: decideAcademicException
+      parameters:
+        - $ref: "#/components/parameters/ExceptionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcademicExceptionDecisionRequest"
+      responses:
+        "200":
+          description: Academic exception decision recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademicException"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /employers:
+    get:
+      tags:
+        - Employers
+      summary: List employers
+      operationId: listEmployers
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/EmployerStatus"
+        - name: industry
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Employers returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployerPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags:
+        - Employers
+      summary: Register employer
+      operationId: createEmployer
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployerCreateRequest"
+      responses:
+        "201":
+          description: Employer registration created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /employers/{employerId}:
+    get:
+      tags:
+        - Employers
+      summary: Get employer
+      operationId: getEmployer
+      parameters:
+        - $ref: "#/components/parameters/EmployerId"
+      responses:
+        "200":
+          description: Employer returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags:
+        - Employers
+      summary: Update employer information
+      operationId: updateEmployer
+      parameters:
+        - $ref: "#/components/parameters/EmployerId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployerUpdateRequest"
+      responses:
+        "200":
+          description: Employer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "412":
+          $ref: "#/components/responses/PreconditionFailed"
+
+  /employers/{employerId}/status-decisions:
+    post:
+      tags:
+        - Employers
+      summary: Record employer status decision
+      description: |
+        Activates, restricts, suspends, rejects or deactivates an employer.
+
+        The previous status and decision reason are retained in audit history.
+      operationId: createEmployerStatusDecision
+      parameters:
+        - $ref: "#/components/parameters/EmployerId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployerStatusDecisionRequest"
+      responses:
+        "200":
+          description: Employer status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /employers/{employerId}/opportunities:
+    get:
+      tags:
+        - Opportunities
+      summary: List employer opportunities
+      operationId: listEmployerOpportunities
+      parameters:
+        - $ref: "#/components/parameters/EmployerId"
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/OpportunityStatus"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Employer opportunities returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpportunityPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags:
+        - Opportunities
+      summary: Create internship opportunity
+      operationId: createOpportunity
+      parameters:
+        - $ref: "#/components/parameters/EmployerId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpportunityCreateRequest"
+      responses:
+        "201":
+          description: Internship opportunity created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternshipOpportunity"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /opportunities:
+    get:
+      tags:
+        - Opportunities
+      summary: Search internship opportunities
+      operationId: listOpportunities
+      parameters:
+        - name: placementCycleId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/OpportunityStatus"
+        - name: academicProgramId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: industry
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: workingModel
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/WorkingModel"
+        - name: availableCapacityOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Internship opportunities returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpportunityPage"
+
+  /opportunities/{opportunityId}:
+    get:
+      tags:
+        - Opportunities
+      summary: Get internship opportunity
+      operationId: getOpportunity
+      parameters:
+        - $ref: "#/components/parameters/OpportunityId"
+      responses:
+        "200":
+          description: Internship opportunity returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternshipOpportunity"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags:
+        - Opportunities
+      summary: Update internship opportunity
+      description: |
+        Updates an opportunity.
+
+        A material change may place the opportunity back into review and may
+        require active applications to be reevaluated.
+      operationId: updateOpportunity
+      parameters:
+        - $ref: "#/components/parameters/OpportunityId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpportunityUpdateRequest"
+      responses:
+        "200":
+          description: Internship opportunity updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternshipOpportunity"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "412":
+          $ref: "#/components/responses/PreconditionFailed"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /opportunities/{opportunityId}/review-decisions:
+    post:
+      tags:
+        - Opportunities
+      summary: Review internship opportunity
+      description: |
+        Approves, rejects, returns or restricts an internship opportunity.
+
+        Approval may require both operational and academic review.
+      operationId: createOpportunityReviewDecision
+      parameters:
+        - $ref: "#/components/parameters/OpportunityId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpportunityReviewDecisionRequest"
+      responses:
+        "200":
+          description: Opportunity review decision recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternshipOpportunity"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /opportunities/{opportunityId}/requirements:
+    get:
+      tags:
+        - Opportunities
+      summary: List opportunity requirements
+      operationId: listOpportunityRequirements
+      parameters:
+        - $ref: "#/components/parameters/OpportunityId"
+      responses:
+        "200":
+          description: Opportunity requirements returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OpportunityRequirement"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags:
+        - Opportunities
+      summary: Add structured opportunity requirement
+      operationId: createOpportunityRequirement
+      parameters:
+        - $ref: "#/components/parameters/OpportunityId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpportunityRequirementCreateRequest"
+      responses:
+        "201":
+          description: Opportunity requirement created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpportunityRequirement"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /opportunities/{opportunityId}/capacity:
+    get:
+      tags:
+        - Opportunities
+      summary: Get current opportunity capacity
+      operationId: getOpportunityCapacity
+      parameters:
+        - $ref: "#/components/parameters/OpportunityId"
+      responses:
+        "200":
+          description: Opportunity capacity returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpportunityCapacity"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /applications:
+    get:
+      tags:
+        - Applications
+      summary: List internship applications
+      operationId: listApplications
+      parameters:
+        - name: studentId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: opportunityId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/ApplicationStatus"
+        - name: placementCycleId
+          in: query
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Applications returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags:
+        - Applications
+      summary: Submit internship application
+      description: |
+        Validates profile completeness, eligibility, deadline, document,
+        application-limit and placement-conflict rules before submission.
+      operationId: createApplication
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationCreateRequest"
+      responses:
+        "201":
+          description: Application submitted successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /applications/{applicationId}:
+    get:
+      tags:
+        - Applications
+      summary: Get internship application
+      operationId: getApplication
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      responses:
+        "200":
+          description: Application returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /applications/{applicationId}/withdrawal:
+    post:
+      tags:
+        - Applications
+      summary: Withdraw internship application
+      operationId: withdrawApplication
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationWithdrawalRequest"
+      responses:
+        "200":
+          description: Application withdrawn successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /applications/{applicationId}/requirement-evaluations:
+    post:
+      tags:
+        - Matching
+      summary: Evaluate opportunity requirements
+      description: |
+        Evaluates every active structured opportunity requirement against the
+        student and application.
+
+        Mandatory requirements are evaluated before compatibility scoring.
+      operationId: createRequirementEvaluations
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequirementEvaluationRequest"
+      responses:
+        "201":
+          description: Requirement evaluations created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RequirementEvaluation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /applications/{applicationId}/match-evaluations:
+    get:
+      tags:
+        - Matching
+      summary: List application match evaluations
+      operationId: listMatchEvaluations
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      responses:
+        "200":
+          description: Match evaluations returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MatchEvaluation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags:
+        - Matching
+      summary: Calculate compatibility evaluation
+      description: |
+        Calculates explainable compatibility indicators for an eligible
+        student-opportunity combination.
+
+        A match evaluation cannot be created when a blocking academic or
+        mandatory requirement failure exists.
+      operationId: createMatchEvaluation
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MatchEvaluationRequest"
+      responses:
+        "201":
+          description: Match evaluation created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchEvaluation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /recommendations:
+    get:
+      tags:
+        - Recommendations
+      summary: List placement recommendations
+      operationId: listRecommendations
+      parameters:
+        - name: studentId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: opportunityId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: applicationId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/RecommendationStatus"
+        - name: capacityStatus
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CapacityStatus"
+        - name: minimumScore
+          in: query
+          required: false
+          schema:
+            type: number
+            format: double
+            minimum: 0
+            maximum: 100
+        - name: minimumConfidence
+          in: query
+          required: false
+          schema:
+            type: number
+            format: double
+            minimum: 0
+            maximum: 100
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Placement recommendations returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecommendationPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags:
+        - Recommendations
+      summary: Generate placement recommendation
+      description: |
+        Creates an explainable advisory recommendation from an eligible match
+        evaluation.
+
+        Creating a recommendation does not confirm a placement or create an
+        offer.
+      operationId: createRecommendation
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecommendationCreateRequest"
+      responses:
+        "201":
+          description: Placement recommendation created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementRecommendation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /recommendations/{recommendationId}:
+    get:
+      tags:
+        - Recommendations
+      summary: Get placement recommendation
+      operationId: getRecommendation
+      parameters:
+        - $ref: "#/components/parameters/RecommendationId"
+      responses:
+        "200":
+          description: Placement recommendation returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementRecommendation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /recommendations/{recommendationId}/decisions:
+    post:
+      tags:
+        - Decisions
+      summary: Record human recommendation decision
+      description: |
+        Records an authorized human review decision.
+
+        The operation preserves the original system recommendation separately
+        from the human decision.
+      operationId: createPlacementDecision
+      parameters:
+        - $ref: "#/components/parameters/RecommendationId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlacementDecisionCreateRequest"
+      responses:
+        "201":
+          description: Human decision recorded successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementDecision"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /decisions/{decisionId}/override:
+    post:
+      tags:
+        - Decisions
+      summary: Create manual override
+      description: |
+        Records an authorized decision that differs from the original system
+        result.
+
+        High-impact overrides may require secondary approval.
+      operationId: createManualOverride
+      parameters:
+        - $ref: "#/components/parameters/DecisionId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManualOverrideCreateRequest"
+      responses:
+        "201":
+          description: Manual override created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManualOverride"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /overrides/{overrideId}/secondary-approval:
+    post:
+      tags:
+        - Decisions
+      summary: Record secondary override approval
+      operationId: approveManualOverride
+      parameters:
+        - $ref: "#/components/parameters/OverrideId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SecondaryApprovalRequest"
+      responses:
+        "200":
+          description: Secondary approval recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManualOverride"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /offers:
+    get:
+      tags:
+        - Offers
+      summary: List placement offers
+      operationId: listPlacementOffers
+      parameters:
+        - name: studentId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: opportunityId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/OfferStatus"
+        - name: expiringBefore
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Placement offers returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OfferPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags:
+        - Offers
+      summary: Create placement offer
+      description: |
+        Creates a placement offer from an approved recommendation decision and
+        reserves opportunity capacity.
+
+        Capacity reservation and offer creation should be processed as one
+        controlled transaction.
+      operationId: createPlacementOffer
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlacementOfferCreateRequest"
+      responses:
+        "201":
+          description: Placement offer created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementOffer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /offers/{offerId}:
+    get:
+      tags:
+        - Offers
+      summary: Get placement offer
+      operationId: getPlacementOffer
+      parameters:
+        - $ref: "#/components/parameters/OfferId"
+      responses:
+        "200":
+          description: Placement offer returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementOffer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /offers/{offerId}/student-response:
+    post:
+      tags:
+        - Offers
+      summary: Record student offer response
+      operationId: recordStudentOfferResponse
+      parameters:
+        - $ref: "#/components/parameters/OfferId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentOfferResponseRequest"
+      responses:
+        "200":
+          description: Student response recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementOffer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /offers/{offerId}/employer-response:
+    post:
+      tags:
+        - Offers
+      summary: Record employer offer response
+      operationId: recordEmployerOfferResponse
+      parameters:
+        - $ref: "#/components/parameters/OfferId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployerOfferResponseRequest"
+      responses:
+        "200":
+          description: Employer response recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementOffer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /offers/{offerId}/expiration:
+    post:
+      tags:
+        - Offers
+      summary: Expire placement offer
+      description: |
+        Expires an unanswered offer and releases its active capacity
+        reservation.
+      operationId: expirePlacementOffer
+      parameters:
+        - $ref: "#/components/parameters/OfferId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Placement offer expired successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementOffer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /placements:
+    get:
+      tags:
+        - Placements
+      summary: List confirmed and historical placements
+      operationId: listPlacements
+      parameters:
+        - name: studentId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: employerId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: opportunityId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: placementCycleId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/PlacementStatus"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Placements returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlacementPage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags:
+        - Placements
+      summary: Confirm final placement
+      description: |
+        Confirms a final internship placement after validating all required
+        prerequisites.
+
+        Required prerequisites may include:
+
+        - Student acceptance
+        - Employer acceptance
+        - Career-center approval
+        - Academic approval
+        - Active opportunity
+        - Valid capacity reservation
+        - Complete required documents
+        - No conflicting confirmed placement
+      operationId: createPlacement
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlacementCreateRequest"
+      responses:
+        "201":
+          description: Final placement confirmed successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Placement"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /placements/{placementId}:
+    get:
+      tags:
+        - Placements
+      summary: Get placement
+      operationId: getPlacement
+      parameters:
+        - $ref: "#/components/parameters/PlacementId"
+      responses:
+        "200":
+          description: Placement returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Placement"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /placements/{placementId}/cancellation:
+    post:
+      tags:
+        - Placements
+      summary: Cancel confirmed placement
+      description: |
+        Creates a controlled placement cancellation.
+
+        Historical placement information is retained. Capacity is released only
+        when the approved cancellation becomes effective.
+      operationId: cancelPlacement
+      parameters:
+        - $ref: "#/components/parameters/PlacementId"
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlacementCancellationRequest"
+      responses:
+        "200":
+          description: Placement cancellation recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Placement"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /placements/{placementId}/outcome:
+    get:
+      tags:
+        - Outcomes
+      summary: Get internship outcome
+      operationId: getInternshipOutcome
+      parameters:
+        - $ref: "#/components/parameters/PlacementId"
+      responses:
+        "200":
+          description: Internship outcome returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternshipOutcome"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Outcomes
+      summary: Create or update internship outcome
+      description: |
+        Records the internship completion result.
+
+        Internship completion and academic-credit approval remain separate
+        statuses.
+      operationId: upsertInternshipOutcome
+      parameters:
+        - $ref: "#/components/parameters/PlacementId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InternshipOutcomeRequest"
+      responses:
+        "200":
+          description: Internship outcome updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternshipOutcome"
+        "201":
+          description: Internship outcome created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternshipOutcome"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "412":
+          $ref: "#/components/responses/PreconditionFailed"
+
+  /intervention-cases:
+    get:
+      tags:
+        - Interventions
+      summary: List unplaced-student intervention cases
+      operationId: listInterventionCases
+      parameters:
+        - name: studentId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: placementCycleId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: priority
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/InterventionPriority"
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/InterventionStatus"
+        - name: assignedTo
+          in: query
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Intervention cases returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterventionCasePage"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+    post:
+      tags:
+        - Interventions
+      summary: Create unplaced-student intervention case
+      operationId: createInterventionCase
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterventionCaseCreateRequest"
+      responses:
+        "201":
+          description: Intervention case created successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterventionCase"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /intervention-cases/{interventionCaseId}:
+    patch:
+      tags:
+        - Interventions
+      summary: Update intervention case
+      operationId: updateInterventionCase
+      parameters:
+        - $ref: "#/components/parameters/InterventionCaseId"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterventionCaseUpdateRequest"
+      responses:
+        "200":
+          description: Intervention case updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterventionCase"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "412":
+          $ref: "#/components/responses/PreconditionFailed"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Example bearer-token authentication.
+
+        Production implementation should use the university-approved identity
+        and access-management service.
+
+  parameters:
+    StudentId:
+      name: studentId
+      in: path
+      required: true
+      description: Stable student identifier
+      schema:
+        type: string
+        example: STUDENT-1042
+
+    EmployerId:
+      name: employerId
+      in: path
+      required: true
+      description: Employer identifier
+      schema:
+        type: string
+        example: EMP-0081
+
+    OpportunityId:
+      name: opportunityId
+      in: path
+      required: true
+      description: Internship opportunity identifier
+      schema:
+        type: string
+        example: OPP-2026-0045
+
+    ApplicationId:
+      name: applicationId
+      in: path
+      required: true
+      description: Internship application identifier
+      schema:
+        type: string
+        example: APP-2026-0231
+
+    EvaluationId:
+      name: evaluationId
+      in: path
+      required: true
+      description: Academic eligibility evaluation identifier
+      schema:
+        type: string
+        example: ELIG-2026-0188
+
+    ExceptionId:
+      name: exceptionId
+      in: path
+      required: true
+      description: Academic exception identifier
+      schema:
+        type: string
+        example: AEX-2026-0031
+
+    RecommendationId:
+      name: recommendationId
+      in: path
+      required: true
+      description: Placement recommendation identifier
+      schema:
+        type: string
+        example: REC-2026-0128
+
+    DecisionId:
+      name: decisionId
+      in: path
+      required: true
+      description: Human placement decision identifier
+      schema:
+        type: string
+        example: DEC-2026-0099
+
+    OverrideId:
+      name: overrideId
+      in: path
+      required: true
+      description: Manual override identifier
+      schema:
+        type: string
+        example: OVR-2026-0012
+
+    OfferId:
+      name: offerId
+      in: path
+      required: true
+      description: Placement offer identifier
+      schema:
+        type: string
+        example: OFFER-2026-0072
+
+    PlacementId:
+      name: placementId
+      in: path
+      required: true
+      description: Confirmed placement identifier
+      schema:
+        type: string
+        example: PL-2026-0044
+
+    InterventionCaseId:
+      name: interventionCaseId
+      in: path
+      required: true
+      description: Intervention-case identifier
+      schema:
+        type: string
+        example: INT-2026-0028
+
+    PlacementCycleIdQuery:
+      name: placementCycleId
+      in: query
+      required: false
+      schema:
+        type: string
+        example: CYCLE-2026-SUMMER
+
+    Page:
+      name: page
+      in: query
+      required: false
+      description: One-based page number
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    PageSize:
+      name: pageSize
+      in: query
+      required: false
+      description: Number of records per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: |
+        Unique key used to prevent duplicate processing of repeated write
+        requests.
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 100
+
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      description: |
+        Entity version used for optimistic concurrency control.
+      schema:
+        type: string
+        example: '"version-4"'
+
+  headers:
+    Location:
+      description: URI of the created resource
+      schema:
+        type: string
+        format: uri
+
+  responses:
+    BadRequest:
+      description: Request structure or value is invalid
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
+    Forbidden:
+      description: Authenticated user is not authorized for the operation
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
+    NotFound:
+      description: Requested resource does not exist or is not visible
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
+    Conflict:
+      description: Request conflicts with the current resource or workflow state
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
+    PreconditionFailed:
+      description: Resource version does not match the supplied precondition
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
+    UnprocessableEntity:
+      description: |
+        Request is structurally valid but violates one or more business rules
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/BusinessRuleProblem"
+
+  schemas:
+    StudentStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+        - graduated
+        - withdrawn
+
+    ProfileStatus:
+      type: string
+      enum:
+        - draft
+        - incomplete
+        - complete
+        - inactive
+
+    DataQualityStatus:
+      type: string
+      enum:
+        - complete
+        - incomplete
+        - stale
+        - conflicting
+        - unverified
+        - low_confidence
+
+    PreferenceStrength:
+      type: string
+      enum:
+        - required
+        - strongly_preferred
+        - preferred
+        - neutral
+        - unacceptable
+
+    EmployerStatus:
+      type: string
+      enum:
+        - pending
+        - active
+        - restricted
+        - suspended
+        - rejected
+        - inactive
+
+    OpportunityStatus:
+      type: string
+      enum:
+        - draft
+        - pending_review
+        - correction_required
+        - approved
+        - active
+        - restricted
+        - closed
+        - cancelled
+        - expired
+
+    WorkingModel:
+      type: string
+      enum:
+        - remote
+        - hybrid
+        - on_site
+
+    RequirementImportance:
+      type: string
+      enum:
+        - mandatory
+        - preferred
+        - optional
+
+    EligibilityStatus:
+      type: string
+      enum:
+        - eligible
+        - ineligible
+        - review_required
+        - data_incomplete
+
+    RequirementEvaluationStatus:
+      type: string
+      enum:
+        - passed
+        - failed
+        - evidence_missing
+        - review_required
+        - not_applicable
+
+    ApplicationStatus:
+      type: string
+      enum:
+        - draft
+        - submitted
+        - eligibility_review
+        - eligible
+        - ineligible
+        - information_required
+        - employer_review
+        - shortlisted
+        - not_selected
+        - recommendation_review
+        - offer_pending
+        - placement_confirmed
+        - withdrawn
+        - expired
+        - closed
+
+    MatchStatus:
+      type: string
+      enum:
+        - excluded
+        - data_incomplete
+        - review_required
+        - eligible
+        - evaluated
+
+    RecommendationStatus:
+      type: string
+      enum:
+        - pending_review
+        - information_required
+        - recommended
+        - limited_recommendation
+        - capacity_hold
+        - approved
+        - rejected
+        - overridden
+        - expired
+        - withdrawn
+        - superseded
+
+    CapacityStatus:
+      type: string
+      enum:
+        - available
+        - limited
+        - temporarily_reserved
+        - fully_reserved
+        - full
+        - uncertain
+        - closed
+
+    DecisionStatus:
+      type: string
+      enum:
+        - approved
+        - rejected
+        - information_required
+        - on_hold
+        - overridden
+
+    OfferStatus:
+      type: string
+      enum:
+        - draft
+        - pending_response
+        - student_accepted
+        - student_declined
+        - employer_confirmed
+        - employer_rejected
+        - accepted
+        - declined
+        - expired
+        - cancelled
+        - superseded
+        - placement_confirmed
+
+    ResponseStatus:
+      type: string
+      enum:
+        - pending
+        - accepted
+        - declined
+        - rejected
+        - expired
+
+    PlacementStatus:
+      type: string
+      enum:
+        - confirmed
+        - active
+        - completed
+        - cancelled
+        - terminated
+        - under_review
+
+    OutcomeStatus:
+      type: string
+      enum:
+        - successfully_completed
+        - partially_completed
+        - failed
+        - cancelled_by_student
+        - cancelled_by_employer
+        - terminated_by_university
+        - under_review
+
+    AcademicCreditStatus:
+      type: string
+      enum:
+        - not_applicable
+        - pending
+        - approved
+        - rejected
+        - under_review
+
+    InterventionPriority:
+      type: string
+      enum:
+        - critical
+        - high
+        - standard
+
+    InterventionStatus:
+      type: string
+      enum:
+        - open
+        - in_progress
+        - waiting_for_student
+        - waiting_for_employer
+        - waiting_for_academic_review
+        - resolved
+        - closed
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - pageSize
+        - totalItems
+        - totalPages
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          example: 1
+        pageSize:
+          type: integer
+          minimum: 1
+          example: 20
+        totalItems:
+          type: integer
+          minimum: 0
+          example: 124
+        totalPages:
+          type: integer
+          minimum: 0
+          example: 7
+
+    Student:
+      type: object
+      required:
+        - studentId
+        - universityAccountId
+        - firstName
+        - lastName
+        - universityEmail
+        - studentStatus
+        - profile
+        - academicRecord
+      properties:
+        studentId:
+          type: string
+          example: STUDENT-1042
+        universityAccountId:
+          type: string
+          example: U-1042
+        firstName:
+          type: string
+          example: Hasan Eren
+        lastName:
+          type: string
+          example: Akın
+        universityEmail:
+          type: string
+          format: email
+          example: student@example-university.edu
+        studentStatus:
+          $ref: "#/components/schemas/StudentStatus"
+        placementParticipationStatus:
+          type: string
+          example: active
+        profile:
+          $ref: "#/components/schemas/StudentProfile"
+        academicRecord:
+          $ref: "#/components/schemas/StudentAcademicRecord"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    StudentProfile:
+      type: object
+      required:
+        - studentProfileId
+        - studentId
+        - profileStatus
+        - profileCompletenessRate
+        - profileVersion
+      properties:
+        studentProfileId:
+          type: string
+          example: PROFILE-1042-V4
+        studentId:
+          type: string
+          example: STUDENT-1042
+        professionalSummary:
+          type: string
+          maxLength: 2000
+        preferredRoleSummary:
+          type: string
+          maxLength: 1000
+        preferredIndustries:
+          type: array
+          items:
+            type: string
+        preferredRoles:
+          type: array
+          items:
+            type: string
+        preferredCities:
+          type: array
+          items:
+            type: string
+        acceptedWorkingModels:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkingModel"
+        availability:
+          $ref: "#/components/schemas/DateRange"
+        profileCompletenessRate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          example: 92.5
+        missingRequiredSections:
+          type: array
+          items:
+            type: string
+        profileStatus:
+          $ref: "#/components/schemas/ProfileStatus"
+        profileVersion:
+          type: integer
+          minimum: 1
+          example: 4
+        effectiveFrom:
+          type: string
+          format: date-time
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+
+    StudentProfileUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        professionalSummary:
+          type: string
+          maxLength: 2000
+        preferredRoleSummary:
+          type: string
+          maxLength: 1000
+        preferredIndustries:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+        preferredRoles:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+        preferredCities:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+        acceptedWorkingModels:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/WorkingModel"
+        availability:
+          $ref: "#/components/schemas/DateRange"
+
+    StudentAcademicRecord:
+      type: object
+      required:
+        - academicRecordId
+        - studentId
+        - academicProgramId
+        - academicYear
+        - enrollmentStatus
+        - sourceSystem
+        - sourceUpdatedAt
+        - dataQualityStatus
+      properties:
+        academicRecordId:
+          type: string
+          example: ACADEMIC-2026-1042-V3
+        studentId:
+          type: string
+          example: STUDENT-1042
+        academicProgramId:
+          type: string
+          example: PROGRAM-MIS
+        academicProgramName:
+          type: string
+          example: Management Information Systems
+        academicYear:
+          type: integer
+          minimum: 1
+          example: 4
+        gpa:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 4
+          nullable: true
+          example: 3.09
+        completedCredits:
+          type: number
+          format: double
+          minimum: 0
+          example: 210
+        enrollmentStatus:
+          type: string
+          example: active
+        previousMandatoryInternshipCompleted:
+          type: boolean
+          example: false
+        sourceSystem:
+          type: string
+          example: student-information-system
+        sourceUpdatedAt:
+          type: string
+          format: date-time
+        dataQualityStatus:
+          $ref: "#/components/schemas/DataQualityStatus"
+
+    StudentSkill:
+      type: object
+      required:
+        - studentSkillId
+        - studentId
+        - skillId
+        - skillName
+        - proficiencyLevel
+        - verificationStatus
+      properties:
+        studentSkillId:
+          type: string
+          example: SS-2041
+        studentId:
+          type: string
+          example: STUDENT-1042
+        skillId:
+          type: string
+          example: SKILL-SQL
+        skillName:
+          type: string
+          example: SQL
+        proficiencyLevel:
+          type: string
+          example: intermediate
+        experienceMonths:
+          type: integer
+          minimum: 0
+          example: 18
+        verificationStatus:
+          type: string
+          enum:
+            - self_declared
+            - document_supported
+            - course_verified
+            - certification_verified
+            - employer_verified
+            - university_verified
+        evidenceReference:
+          type: string
+          nullable: true
+          example: COURSE-DB-201
+        lastUsedDate:
+          type: string
+          format: date
+          nullable: true
+        effectiveFrom:
+          type: string
+          format: date-time
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+
+    StudentSkillCreateRequest:
+      type: object
+      required:
+        - skillId
+        - proficiencyLevel
+        - verificationStatus
+      properties:
+        skillId:
+          type: string
+          example: SKILL-SQL
+        proficiencyLevel:
+          type: string
+          example: intermediate
+        experienceMonths:
+          type: integer
+          minimum: 0
+        verificationStatus:
+          type: string
+          enum:
+            - self_declared
+            - document_supported
+            - course_verified
+            - certification_verified
+            - employer_verified
+            - university_verified
+        evidenceReference:
+          type: string
+          nullable: true
+        lastUsedDate:
+          type: string
+          format: date
+          nullable: true
+
+    StudentPreference:
+      type: object
+      required:
+        - studentPreferenceId
+        - category
+        - value
+        - strength
+        - preferenceVersion
+      properties:
+        studentPreferenceId:
+          type: string
+          example: PREF-1042-021
+        category:
+          type: string
+          enum:
+            - industry
+            - role
+            - employer
+            - city
+            - location
+            - working_model
+            - internship_period
+            - compensation
+            - language
+            - travel_distance
+        value:
+          type: string
+          example: hybrid
+        strength:
+          $ref: "#/components/schemas/PreferenceStrength"
+        preferenceVersion:
+          type: integer
+          minimum: 1
+          example: 3
+        effectiveFrom:
+          type: string
+          format: date-time
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+
+    StudentPreferenceInput:
+      type: object
+      required:
+        - category
+        - value
+        - strength
+      properties:
+        category:
+          type: string
+          enum:
+            - industry
+            - role
+            - employer
+            - city
+            - location
+            - working_model
+            - internship_period
+            - compensation
+            - language
+            - travel_distance
+        value:
+          type: string
+          maxLength: 250
+        strength:
+          $ref: "#/components/schemas/PreferenceStrength"
+
+    StudentPreferenceSetRequest:
+      type: object
+      required:
+        - preferences
+        - changeReason
+      properties:
+        preferences:
+          type: array
+          maxItems: 100
+          items:
+            $ref: "#/components/schemas/StudentPreferenceInput"
+        changeReason:
+          type: string
+          minLength: 5
+          maxLength: 500
+
+    StudentPreferenceSet:
+      type: object
+      required:
+        - studentId
+        - preferenceVersion
+        - preferences
+        - createdAt
+      properties:
+        studentId:
+          type: string
+        preferenceVersion:
+          type: integer
+          minimum: 1
+        preferences:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentPreference"
+        createdAt:
+          type: string
+          format: date-time
+
+    EligibilityEvaluationRequest:
+      type: object
+      required:
+        - placementCycleId
+      properties:
+        placementCycleId:
+          type: string
+          example: CYCLE-2026-SUMMER
+        academicRecordId:
+          type: string
+          nullable: true
+          description: |
+            Optional explicit academic record. The active authoritative record
+            is used when this field is omitted.
+        forceReevaluation:
+          type: boolean
+          default: false
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+
+    EligibilityRuleResult:
+      type: object
+      required:
+        - ruleId
+        - ruleVersion
+        - expectedValue
+        - resultStatus
+      properties:
+        ruleId:
+          type: string
+          example: BR-AE-004
+        ruleVersion:
+          type: string
+          example: "1.0"
+        ruleName:
+          type: string
+          example: Minimum GPA
+        expectedValue:
+          type: string
+          example: "2.50"
+        observedValue:
+          type: string
+          nullable: true
+          example: "3.09"
+        resultStatus:
+          type: string
+          enum:
+            - passed
+            - failed
+            - missing
+            - review_required
+            - not_applicable
+        explanation:
+          type: string
+          maxLength: 2000
+
+    EligibilityEvaluation:
+      type: object
+      required:
+        - eligibilityEvaluationId
+        - studentId
+        - placementCycleId
+        - academicRecordId
+        - eligibilityStatus
+        - ruleSetVersion
+        - dataQualityStatus
+        - ruleResults
+        - evaluatedAt
+      properties:
+        eligibilityEvaluationId:
+          type: string
+          example: ELIG-2026-0188
+        studentId:
+          type: string
+          example: STUDENT-1042
+        placementCycleId:
+          type: string
+          example: CYCLE-2026-SUMMER
+        academicRecordId:
+          type: string
+          example: ACADEMIC-2026-1042-V3
+        eligibilityStatus:
+          $ref: "#/components/schemas/EligibilityStatus"
+        ruleSetVersion:
+          type: string
+          example: ACADEMIC-RULES-2026.1
+        dataQualityStatus:
+          $ref: "#/components/schemas/DataQualityStatus"
+        failedRuleCount:
+          type: integer
+          minimum: 0
+          example: 0
+        ruleResults:
+          type: array
+          items:
+            $ref: "#/components/schemas/EligibilityRuleResult"
+        activeExceptionIds:
+          type: array
+          items:
+            type: string
+        evaluatedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    EligibilityEvaluationPage:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/EligibilityEvaluation"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    AcademicExceptionCreateRequest:
+      type: object
+      required:
+        - ruleId
+        - requestReason
+      properties:
+        ruleId:
+          type: string
+          example: BR-AE-004
+        requestReason:
+          type: string
+          minLength: 20
+          maxLength: 3000
+        supportingEvidenceReferences:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+        requestedValidity:
+          $ref: "#/components/schemas/DateRange"
+
+    AcademicExceptionDecisionRequest:
+      type: object
+      required:
+        - decision
+        - decisionReason
+      properties:
+        decision:
+          type: string
+          enum:
+            - approved
+            - rejected
+            - information_required
+        decisionReason:
+          type: string
+          minLength: 20
+          maxLength: 3000
+        validFrom:
+          type: string
+          format: date
+          nullable: true
+        validTo:
+          type: string
+          format: date
+          nullable: true
+        conditions:
+          type: array
+          items:
+            type: string
+
+    AcademicException:
+      type: object
+      required:
+        - academicExceptionId
+        - eligibilityEvaluationId
+        - studentId
+        - ruleId
+        - requestStatus
+        - requestReason
+        - requestedAt
+      properties:
+        academicExceptionId:
+          type: string
+          example: AEX-2026-0031
+        eligibilityEvaluationId:
+          type: string
+        studentId:
+          type: string
+        ruleId:
+          type: string
+        requestReason:
+          type: string
+        requestStatus:
+          type: string
+          enum:
+            - pending
+            - information_required
+            - approved
+            - rejected
+            - expired
+            - withdrawn
+        requestedBy:
+          type: string
+        requestedAt:
+          type: string
+          format: date-time
+        decidedBy:
+          type: string
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decisionReason:
+          type: string
+          nullable: true
+        validFrom:
+          type: string
+          format: date
+          nullable: true
+        validTo:
+          type: string
+          format: date
+          nullable: true
+
+    Employer:
+      type: object
+      required:
+        - employerId
+        - employerName
+        - industry
+        - employerStatus
+        - verificationStatus
+      properties:
+        employerId:
+          type: string
+          example: EMP-0081
+        employerName:
+          type: string
+          example: Example Technology A.Ş.
+        industry:
+          type: string
+          example: Technology
+        registrationIdentifier:
+          type: string
+          nullable: true
+        website:
+          type: string
+          format: uri
+          nullable: true
+        headquartersCity:
+          type: string
+          nullable: true
+        employerStatus:
+          $ref: "#/components/schemas/EmployerStatus"
+        universityRelationshipStatus:
+          type: string
+          example: approved_partner
+        verificationStatus:
+          type: string
+          enum:
+            - pending
+            - verified
+            - failed
+            - review_required
+        statusReason:
+          type: string
+          nullable: true
+        verifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+          minimum: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    EmployerCreateRequest:
+      type: object
+      required:
+        - employerName
+        - industry
+        - representative
+      properties:
+        employerName:
+          type: string
+          minLength: 2
+          maxLength: 250
+        industry:
+          type: string
+          minLength: 2
+          maxLength: 100
+        registrationIdentifier:
+          type: string
+          maxLength: 100
+          nullable: true
+        website:
+          type: string
+          format: uri
+          nullable: true
+        headquartersCity:
+          type: string
+          maxLength: 100
+          nullable: true
+        representative:
+          $ref: "#/components/schemas/EmployerRepresentativeInput"
+
+    EmployerUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        employerName:
+          type: string
+          minLength: 2
+          maxLength: 250
+        industry:
+          type: string
+          maxLength: 100
+        website:
+          type: string
+          format: uri
+          nullable: true
+        headquartersCity:
+          type: string
+          maxLength: 100
+          nullable: true
+
+    EmployerRepresentativeInput:
+      type: object
+      required:
+        - fullName
+        - email
+        - roleTitle
+      properties:
+        fullName:
+          type: string
+          maxLength: 200
+        email:
+          type: string
+          format: email
+        roleTitle:
+          type: string
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 50
+          nullable: true
+
+    EmployerStatusDecisionRequest:
+      type: object
+      required:
+        - newStatus
+        - decisionReason
+      properties:
+        newStatus:
+          $ref: "#/components/schemas/EmployerStatus"
+        decisionReason:
+          type: string
+          minLength: 20
+          maxLength: 3000
+        affectedOpportunityAction:
+          type: string
+          enum:
+            - no_change
+            - review_active_opportunities
+            - restrict_new_activity
+            - close_pending_opportunities
+        effectiveAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    EmployerPage:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Employer"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    InternshipOpportunity:
+      type: object
+      required:
+        - opportunityId
+        - employerId
+        - placementCycleId
+        - opportunityTitle
+        - roleCategory
+        - industry
+        - responsibilities
+        - workingModel
+        - internshipStartDate
+        - internshipEndDate
+        - applicationDeadline
+        - totalCapacity
+        - capacity
+        - opportunityStatus
+        - opportunityVersion
+      properties:
+        opportunityId:
+          type: string
+          example: OPP-2026-0045
+        employerId:
+          type: string
+          example: EMP-0081
+        placementCycleId:
+          type: string
+          example: CYCLE-2026-SUMMER
+        targetAcademicProgramIds:
+          type: array
+          items:
+            type: string
+        opportunityTitle:
+          type: string
+          example: Business Intelligence Intern
+        roleCategory:
+          type: string
+          example: Business Intelligence
+        industry:
+          type: string
+          example: Technology
+        responsibilities:
+          type: string
+          maxLength: 10000
+        city:
+          type: string
+          nullable: true
+          example: Istanbul
+        workingModel:
+          $ref: "#/components/schemas/WorkingModel"
+        internshipStartDate:
+          type: string
+          format: date
+          example: 2026-07-07
+        internshipEndDate:
+          type: string
+          format: date
+          example: 2026-08-25
+        applicationDeadline:
+          type: string
+          format: date-time
+          example: 2026-05-31T17:00:00+03:00
+        compensationDescription:
+          type: string
+          nullable: true
+        totalCapacity:
+          type: integer
+          minimum: 1
+          example: 3
+        capacity:
+          $ref: "#/components/schemas/OpportunityCapacity"
+        opportunityStatus:
+          $ref: "#/components/schemas/OpportunityStatus"
+        opportunityVersion:
+          type: integer
+          minimum: 1
+          example: 2
+        requirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpportunityRequirement"
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    OpportunityCreateRequest:
+      type: object
+      required:
+        - placementCycleId
+        - opportunityTitle
+        - roleCategory
+        - industry
+        - responsibilities
+        - workingModel
+        - internshipStartDate
+        - internshipEndDate
+        - applicationDeadline
+        - totalCapacity
+      properties:
+        placementCycleId:
+          type: string
+        targetAcademicProgramIds:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            type: string
+        opportunityTitle:
+          type: string
+          minLength: 3
+          maxLength: 250
+        roleCategory:
+          type: string
+          minLength: 2
+          maxLength: 150
+        industry:
+          type: string
+          minLength: 2
+          maxLength: 150
+        responsibilities:
+          type: string
+          minLength: 20
+          maxLength: 10000
+        city:
+          type: string
+          maxLength: 100
+          nullable: true
+        workingModel:
+          $ref: "#/components/schemas/WorkingModel"
+        internshipStartDate:
+          type: string
+          format: date
+        internshipEndDate:
+          type: string
+          format: date
+        applicationDeadline:
+          type: string
+          format: date-time
+        compensationDescription:
+          type: string
+          maxLength: 1000
+          nullable: true
+        totalCapacity:
+          type: integer
+          minimum: 1
+        requirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpportunityRequirementCreateRequest"
+
+    OpportunityUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        opportunityTitle:
+          type: string
+          minLength: 3
+          maxLength: 250
+        roleCategory:
+          type: string
+          maxLength: 150
+        responsibilities:
+          type: string
+          minLength: 20
+          maxLength: 10000
+        city:
+          type: string
+          maxLength: 100
+          nullable: true
+        workingModel:
+          $ref: "#/components/schemas/WorkingModel"
+        internshipStartDate:
+          type: string
+          format: date
+        internshipEndDate:
+          type: string
+          format: date
+        applicationDeadline:
+          type: string
+          format: date-time
+        compensationDescription:
+          type: string
+          maxLength: 1000
+          nullable: true
+        totalCapacity:
+          type: integer
+          minimum: 1
+        changeReason:
+          type: string
+          minLength: 10
+          maxLength: 1000
+
+    OpportunityReviewDecisionRequest:
+      type: object
+      required:
+        - decision
+        - decisionReason
+      properties:
+        decision:
+          type: string
+          enum:
+            - approved
+            - rejected
+            - correction_required
+            - restricted
+        decisionReason:
+          type: string
+          minLength: 20
+          maxLength: 3000
+        academicReviewStatus:
+          type: string
+          enum:
+            - not_required
+            - pending
+            - approved
+            - rejected
+        restrictions:
+          type: array
+          items:
+            type: string
+
+    OpportunityRequirement:
+      type: object
+      required:
+        - opportunityRequirementId
+        - opportunityId
+        - requirementCategory
+        - requirementName
+        - requirementOperator
+        - requiredValue
+        - importance
+        - requirementVersion
+      properties:
+        opportunityRequirementId:
+          type: string
+          example: REQ-2026-0191
+        opportunityId:
+          type: string
+          example: OPP-2026-0045
+        skillId:
+          type: string
+          nullable: true
+          example: SKILL-SQL
+        requirementCategory:
+          type: string
+          enum:
+            - skill
+            - academic_program
+            - academic_year
+            - gpa
+            - language
+            - certification
+            - availability
+            - location
+            - working_model
+            - document
+            - other
+        requirementName:
+          type: string
+          example: SQL proficiency
+        requirementOperator:
+          type: string
+          enum:
+            - equals
+            - not_equals
+            - minimum
+            - maximum
+            - contains
+            - one_of
+            - date_range_contains
+            - boolean
+        requiredValue:
+          type: string
+          example: intermediate
+        importance:
+          $ref: "#/components/schemas/RequirementImportance"
+        verificationLevel:
+          type: string
+          enum:
+            - self_declared_allowed
+            - evidence_required
+            - verified_required
+        description:
+          type: string
+          nullable: true
+        requirementVersion:
+          type: integer
+          minimum: 1
+        effectiveFrom:
+          type: string
+          format: date-time
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+
+    OpportunityRequirementCreateRequest:
+      type: object
+      required:
+        - requirementCategory
+        - requirementName
+        - requirementOperator
+        - requiredValue
+        - importance
+      properties:
+        skillId:
+          type: string
+          nullable: true
+        requirementCategory:
+          type: string
+          enum:
+            - skill
+            - academic_program
+            - academic_year
+            - gpa
+            - language
+            - certification
+            - availability
+            - location
+            - working_model
+            - document
+            - other
+        requirementName:
+          type: string
+          minLength: 2
+          maxLength: 250
+        requirementOperator:
+          type: string
+          enum:
+            - equals
+            - not_equals
+            - minimum
+            - maximum
+            - contains
+            - one_of
+            - date_range_contains
+            - boolean
+        requiredValue:
+          type: string
+          maxLength: 500
+        importance:
+          $ref: "#/components/schemas/RequirementImportance"
+        verificationLevel:
+          type: string
+          enum:
+            - self_declared_allowed
+            - evidence_required
+            - verified_required
+          default: self_declared_allowed
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+
+    OpportunityCapacity:
+      type: object
+      required:
+        - totalCapacity
+        - confirmedPlacements
+        - activeReservations
+        - availableCapacity
+        - capacityStatus
+        - calculatedAt
+      properties:
+        totalCapacity:
+          type: integer
+          minimum: 0
+          example: 3
+        confirmedPlacements:
+          type: integer
+          minimum: 0
+          example: 1
+        activeReservations:
+          type: integer
+          minimum: 0
+          example: 1
+        availableCapacity:
+          type: integer
+          minimum: 0
+          example: 1
+        capacityStatus:
+          $ref: "#/components/schemas/CapacityStatus"
+        calculatedAt:
+          type: string
+          format: date-time
+
+    OpportunityPage:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InternshipOpportunity"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    ApplicationCreateRequest:
+      type: object
+      required:
+        - studentId
+        - opportunityId
+      properties:
+        studentId:
+          type: string
+          example: STUDENT-1042
+        opportunityId:
+          type: string
+          example: OPP-2026-0045
+        documentReferences:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+        applicationSource:
+          type: string
+          enum:
+            - university_system
+            - assisted
+            - external_student_sourced
+          default: university_system
+        studentStatement:
+          type: string
+          maxLength: 3000
+          nullable: true
+
+    ApplicationWithdrawalRequest:
+      type: object
+      required:
+        - withdrawalReason
+      properties:
+        withdrawalReason:
+          type: string
+          minLength: 10
+          maxLength: 2000
+
+    Application:
+      type: object
+      required:
+        - applicationId
+        - studentId
+        - opportunityId
+        - studentProfileVersion
+        - preferenceVersion
+        - applicationStatus
+        - submittedAt
+      properties:
+        applicationId:
+          type: string
+          example: APP-2026-0231
+        studentId:
+          type: string
+          example: STUDENT-1042
+        opportunityId:
+          type: string
+          example: OPP-2026-0045
+        placementCycleId:
+          type: string
+          example: CYCLE-2026-SUMMER
+        studentProfileVersion:
+          type: integer
+          minimum: 1
+        preferenceVersion:
+          type: integer
+          minimum: 1
+        eligibilityEvaluationId:
+          type: string
+          nullable: true
+        applicationStatus:
+          $ref: "#/components/schemas/ApplicationStatus"
+        statusReasonCode:
+          type: string
+          nullable: true
+        statusReason:
+          type: string
+          nullable: true
+        applicationSource:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        withdrawnAt:
+          type: string
+          format: date-time
+          nullable: true
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+          minimum: 1
+
+    ApplicationPage:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Application"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    RequirementEvaluationRequest:
+      type: object
+      properties:
+        forceReevaluation:
+          type: boolean
+          default: false
+        reason:
+          type: string
+          maxLength: 500
+          nullable: true
+
+    RequirementEvaluation:
+      type: object
+      required:
+        - requirementEvaluationId
+        - applicationId
+        - opportunityRequirementId
+        - evaluationStatus
+        - requiredValue
+        - evaluatedAt
+        - ruleVersion
+      properties:
+        requirementEvaluationId:
+          type: string
+          example: REVAL-2026-0502
+        applicationId:
+          type: string
+          example: APP-2026-0231
+        opportunityRequirementId:
+          type: string
+          example: REQ-2026-0191
+        importance:
+          $ref: "#/components/schemas/RequirementImportance"
+        evaluationStatus:
+          $ref: "#/components/schemas/RequirementEvaluationStatus"
+        observedValue:
+          type: string
+          nullable: true
+          example: intermediate
+        requiredValue:
+          type: string
+          example: intermediate
+        evidenceReference:
+          type: string
+          nullable: true
+        explanation:
+          type: string
+          maxLength: 2000
+        evaluatedAt:
+          type: string
+          format: date-time
+        ruleVersion:
+          type: string
+          example: REQUIREMENT-EVALUATION-1.0
+
+    MatchEvaluationRequest:
+      type: object
+      required:
+        - modelVersion
+      properties:
+        modelVersion:
+          type: string
+          example: MATCHING-MODEL-1.0
+        forceReevaluation:
+          type: boolean
+          default: false
+        evaluationReason:
+          type: string
+          maxLength: 500
+          nullable: true
+
+    MatchIndicator:
+      type: object
+      required:
+        - indicatorName
+        - indicatorValue
+        - indicatorWeight
+        - weightedValue
+        - indicatorStatus
+        - explanation
+      properties:
+        indicatorName:
+          type: string
+          enum:
+            - skill_compatibility
+            - academic_relevance
+            - preferred_requirement_satisfaction
+            - role_preference_alignment
+            - industry_preference_alignment
+            - location_compatibility
+            - working_model_compatibility
+            - internship_period_compatibility
+            - language_compatibility
+        indicatorValue:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          example: 90
+        indicatorWeight:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          example: 0.25
+        weightedValue:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          example: 22.5
+        indicatorStatus:
+          type: string
+          enum:
+            - calculated
+            - missing
+            - excluded
+            - review_required
+        explanation:
+          type: string
+          maxLength: 2000
+        sourceReferences:
+          type: array
+          items:
+            type: string
+
+    ConfidenceFactor:
+      type: object
+      required:
+        - factorName
+        - factorValue
+        - factorWeight
+        - weightedValue
+      properties:
+        factorName:
+          type: string
+          enum:
+            - profile_completeness
+            - academic_data_freshness
+            - skill_evidence_quality
+            - requirement_clarity
+            - preference_freshness
+            - evidence_completeness
+            - data_consistency
+        factorValue:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+        factorWeight:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        weightedValue:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+        explanation:
+          type: string
+          nullable: true
+
+    MatchEvaluation:
+      type: object
+      required:
+        - matchEvaluationId
+        - applicationId
+        - eligibilityEvaluationId
+        - overallCompatibilityScore
+        - confidenceLevel
+        - matchStatus
+        - modelVersion
+        - preferenceVersion
+        - dataQualityStatus
+        - indicators
+        - confidenceFactors
+        - evaluatedAt
+      properties:
+        matchEvaluationId:
+          type: string
+          example: MATCH-2026-0194
+        applicationId:
+          type: string
+          example: APP-2026-0231
+        eligibilityEvaluationId:
+          type: string
+          example: ELIG-2026-0188
+        overallCompatibilityScore:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          example: 90.5
+        compatibilityClassification:
+          type: string
+          enum:
+            - very_strong
+            - strong
+            - moderate
+            - limited
+            - weak
+        confidenceLevel:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          example: 94
+        confidenceClassification:
+          type: string
+          enum:
+            - high
+            - good
+            - moderate
+            - low
+        matchStatus:
+          $ref: "#/components/schemas/MatchStatus"
+        modelVersion:
+          type: string
+          example: MATCHING-MODEL-1.0
+        preferenceVersion:
+          type: integer
+          minimum: 1
+        dataQualityStatus:
+          $ref: "#/components/schemas/DataQualityStatus"
+        hardConstraintConflict:
+          type: boolean
+          example: false
+        indicators:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchIndicator"
+        confidenceFactors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConfidenceFactor"
+        evaluatedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    RecommendationCreateRequest:
+      type: object
+      required:
+        - matchEvaluationId
+      properties:
+        matchEvaluationId:
+          type: string
+          example: MATCH-2026-0194
+        comparisonGroup:
+          type: string
+          enum:
+            - candidates_for_opportunity
+            - opportunities_for_student
+            - department_cycle
+            - intervention_priority
+          default: candidates_for_opportunity
+        recommendationValidityHours:
+          type: integer
+          minimum: 1
+          maximum: 720
+          default: 168
+
+    RecommendationEvidence:
+      type: object
+      required:
+        - evidenceType
+        - evidenceName
+        - evidenceStatus
+        - explanation
+      properties:
+        evidenceType:
+          type: string
+          enum:
+            - eligibility
+            - mandatory_requirement
+            - preferred_requirement
+            - match_indicator
+            - student_preference
+            - capacity
+            - conflict
+            - data_quality
+            - exception
+        evidenceReference:
+          type: string
+          nullable: true
+        evidenceName:
+          type: string
+        observedValue:
+          type: string
+          nullable: true
+        expectedValue:
+          type: string
+          nullable: true
+        evidenceStatus:
+          type: string
+          enum:
+            - supporting
+            - warning
+            - blocking
+            - informational
+        explanation:
+          type: string
+          maxLength: 2000
+
+    PlacementRecommendation:
+      type: object
+      required:
+        - recommendationId
+        - applicationId
+        - matchEvaluationId
+        - recommendationStatus
+        - overallScore
+        - confidenceLevel
+        - capacityStatus
+        - conflictStatus
+        - recommendationRank
+        - explanationSummary
+        - evidence
+        - generatedAt
+        - modelVersion
+      properties:
+        recommendationId:
+          type: string
+          example: REC-2026-0128
+        applicationId:
+          type: string
+          example: APP-2026-0231
+        matchEvaluationId:
+          type: string
+          example: MATCH-2026-0194
+        studentId:
+          type: string
+          example: STUDENT-1042
+        opportunityId:
+          type: string
+          example: OPP-2026-0045
+        recommendationStatus:
+          $ref: "#/components/schemas/RecommendationStatus"
+        recommendationType:
+          type: string
+          enum:
+            - standard
+            - intervention
+            - exceptional_review
+        overallScore:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          example: 90.5
+        confidenceLevel:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          example: 94
+        recommendationRank:
+          type: integer
+          minimum: 1
+          example: 2
+        comparisonGroup:
+          type: string
+          example: candidates_for_opportunity
+        capacityStatus:
+          $ref: "#/components/schemas/CapacityStatus"
+        conflictStatus:
+          type: string
+          enum:
+            - none
+            - warning
+            - blocking
+        placementUrgency:
+          type: string
+          enum:
+            - critical
+            - high
+            - standard
+          nullable: true
+        explanationSummary:
+          type: string
+          maxLength: 5000
+        evidence:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecommendationEvidence"
+        generatedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        ruleSetVersion:
+          type: string
+        modelVersion:
+          type: string
+
+    RecommendationPage:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlacementRecommendation"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    PlacementDecisionCreateRequest:
+      type: object
+      required:
+        - decisionStatus
+        - decisionReasonCategory
+        - decisionReason
+      properties:
+        decisionStatus:
+          $ref: "#/components/schemas/DecisionStatus"
+        decisionReasonCategory:
+          type: string
+          enum:
+            - recommendation_supported
+            - insufficient_compatibility
+            - student_preference_conflict
+            - opportunity_unavailable
+            - employer_condition_changed
+            - academic_concern
+            - incomplete_information
+            - duplicate_or_conflicting_process
+            - alternative_candidate_selected
+            - additional_information_required
+            - exceptional_context
+            - other
+        decisionReason:
+          type: string
+          minLength: 20
+          maxLength: 5000
+        supportingEvidenceReferences:
+          type: array
+          items:
+            type: string
+        secondaryApprovalRequired:
+          type: boolean
+          default: false
+
+    PlacementDecision:
+      type: object
+      required:
+        - placementDecisionId
+        - recommendationId
+        - decisionStatus
+        - decisionReasonCategory
+        - decisionReason
+        - decidedBy
+        - decidedAt
+        - decisionVersion
+      properties:
+        placementDecisionId:
+          type: string
+          example: DEC-2026-0099
+        recommendationId:
+          type: string
+          example: REC-2026-0128
+        decisionStatus:
+          $ref: "#/components/schemas/DecisionStatus"
+        decisionReasonCategory:
+          type: string
+        decisionReason:
+          type: string
+        decidedBy:
+          type: string
+          example: STAFF-0035
+        decidedAt:
+          type: string
+          format: date-time
+        secondaryApprovalRequired:
+          type: boolean
+        secondaryApprovedBy:
+          type: string
+          nullable: true
+        secondaryApprovedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decisionVersion:
+          type: integer
+          minimum: 1
+
+    ManualOverrideCreateRequest:
+      type: object
+      required:
+        - originalResult
+        - finalResult
+        - overrideCategory
+        - overrideReason
+      properties:
+        originalResult:
+          type: string
+          maxLength: 500
+        finalResult:
+          type: string
+          maxLength: 500
+        overrideCategory:
+          type: string
+          enum:
+            - academic_exception
+            - operational_context
+            - accessibility_support
+            - employer_requirement_interpretation
+            - data_correction
+            - capacity_exception
+            - fairness_review
+            - other
+        overrideReason:
+          type: string
+          minLength: 30
+          maxLength: 5000
+        supportingEvidenceReferences:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: string
+        secondaryApprovalRequired:
+          type: boolean
+          default: false
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+
+    SecondaryApprovalRequest:
+      type: object
+      required:
+        - decision
+        - approvalReason
+      properties:
+        decision:
+          type: string
+          enum:
+            - approved
+            - rejected
+            - information_required
+        approvalReason:
+          type: string
+          minLength: 20
+          maxLength: 3000
+
+    ManualOverride:
+      type: object
+      required:
+        - manualOverrideId
+        - placementDecisionId
+        - originalResult
+        - finalResult
+        - overrideCategory
+        - overrideReason
+        - approvedBy
+        - approvedAt
+        - secondaryApprovalRequired
+      properties:
+        manualOverrideId:
+          type: string
+          example: OVR-2026-0012
+        placementDecisionId:
+          type: string
+          example: DEC-2026-0099
+        originalResult:
+          type: string
+        finalResult:
+          type: string
+        overrideCategory:
+          type: string
+        overrideReason:
+          type: string
+        supportingEvidenceReferences:
+          type: array
+          items:
+            type: string
+        approvedBy:
+          type: string
+        approvedAt:
+          type: string
+          format: date-time
+        secondaryApprovalRequired:
+          type: boolean
+        secondaryApprovalStatus:
+          type: string
+          enum:
+            - not_required
+            - pending
+            - approved
+            - rejected
+            - information_required
+        secondaryApprovedBy:
+          type: string
+          nullable: true
+        secondaryApprovedAt:
+          type: string
+          format: date-time
+          nullable: true
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+
+    PlacementOfferCreateRequest:
+      type: object
+      required:
+        - placementDecisionId
+        - studentId
+        - opportunityId
+        - offerExpiresAt
+        - internshipStartDate
+        - internshipEndDate
+        - workingModel
+      properties:
+        placementDecisionId:
+          type: string
+          example: DEC-2026-0099
+        studentId:
+          type: string
+          example: STUDENT-1042
+        opportunityId:
+          type: string
+          example: OPP-2026-0045
+        offerExpiresAt:
+          type: string
+          format: date-time
+        internshipStartDate:
+          type: string
+          format: date
+        internshipEndDate:
+          type: string
+          format: date
+        workingModel:
+          $ref: "#/components/schemas/WorkingModel"
+        city:
+          type: string
+          nullable: true
+        conditions:
+          type: array
+          items:
+            type: string
+
+    StudentOfferResponseRequest:
+      type: object
+      required:
+        - response
+      properties:
+        response:
+          type: string
+          enum:
+            - accepted
+            - declined
+            - clarification_requested
+        responseReason:
+          type: string
+          maxLength: 2000
+          nullable: true
+
+    EmployerOfferResponseRequest:
+      type: object
+      required:
+        - response
+      properties:
+        response:
+          type: string
+          enum:
+            - accepted
+            - rejected
+            - information_requested
+        responseReasonCategory:
+          type: string
+          nullable: true
+        responseReason:
+          type: string
+          maxLength: 3000
+          nullable: true
+        confidentialNotes:
+          type: string
+          maxLength: 5000
+          nullable: true
+
+    CapacityReservation:
+      type: object
+      required:
+        - capacityReservationId
+        - opportunityId
+        - placementOfferId
+        - studentId
+        - reservationStatus
+        - reservedAt
+        - expiresAt
+      properties:
+        capacityReservationId:
+          type: string
+          example: RES-2026-0058
+        opportunityId:
+          type: string
+        placementOfferId:
+          type: string
+        studentId:
+          type: string
+        reservationStatus:
+          type: string
+          enum:
+            - active
+            - consumed
+            - released
+            - expired
+        reservedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        releasedAt:
+          type: string
+          format: date-time
+          nullable: true
+        releaseReason:
+          type: string
+          nullable: true
+
+    PlacementOffer:
+      type: object
+      required:
+        - placementOfferId
+        - placementDecisionId
+        - studentId
+        - opportunityId
+        - offerStatus
+        - offerCreatedAt
+        - offerExpiresAt
+        - studentResponseStatus
+        - employerResponseStatus
+        - capacityReservation
+      properties:
+        placementOfferId:
+          type: string
+          example: OFFER-2026-0072
+        placementDecisionId:
+          type: string
+          example: DEC-2026-0099
+        studentId:
+          type: string
+          example: STUDENT-1042
+        opportunityId:
+          type: string
+          example: OPP-2026-0045
+        offerStatus:
+          $ref: "#/components/schemas/OfferStatus"
+        offerCreatedAt:
+          type: string
+          format: date-time
+        offerExpiresAt:
+          type: string
+          format: date-time
+        studentResponseStatus:
+          $ref: "#/components/schemas/ResponseStatus"
+        studentRespondedAt:
+          type: string
+          format: date-time
+          nullable: true
+        employerResponseStatus:
+          $ref: "#/components/schemas/ResponseStatus"
+        employerRespondedAt:
+          type: string
+          format: date-time
+          nullable: true
+        internshipStartDate:
+          type: string
+          format: date
+        internshipEndDate:
+          type: string
+          format: date
+        workingModel:
+          $ref: "#/components/schemas/WorkingModel"
+        city:
+          type: string
+          nullable: true
+        conditions:
+          type: array
+          items:
+            type: string
+        capacityReservation:
+          $ref: "#/components/schemas/CapacityReservation"
+        offerVersion:
+          type: integer
+          minimum: 1
+
+    OfferPage:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlacementOffer"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    PlacementCreateRequest:
+      type: object
+      required:
+        - placementOfferId
+      properties:
+        placementOfferId:
+          type: string
+          example: OFFER-2026-0072
+        academicApprovalReference:
+          type: string
+          nullable: true
+        requiredDocumentReferences:
+          type: array
+          items:
+            type: string
+        confirmationReason:
+          type: string
+          minLength: 10
+          maxLength: 2000
+
+    PlacementCancellationRequest:
+      type: object
+      required:
+        - requestedByParty
+        - cancellationReasonCategory
+        - cancellationReason
+        - effectiveDate
+      properties:
+        requestedByParty:
+          type: string
+          enum:
+            - student
+            - employer
+            - career_center
+            - academic_unit
+            - university
+        cancellationReasonCategory:
+          type: string
+          enum:
+            - student_withdrawal
+            - employer_cancellation
+            - academic_ineligibility
+            - unsafe_conditions
+            - schedule_conflict
+            - inaccurate_information
+            - agreement_failure
+            - other
+        cancellationReason:
+          type: string
+          minLength: 20
+          maxLength: 5000
+        effectiveDate:
+          type: string
+          format: date
+        capacityReleaseRequested:
+          type: boolean
+          default: true
+        replacementSupportRequired:
+          type: boolean
+          default: false
+
+    Placement:
+      type: object
+      required:
+        - placementId
+        - studentId
+        - employerId
+        - opportunityId
+        - placementOfferId
+        - placementCycleId
+        - placementStatus
+        - confirmedAt
+        - internshipStartDate
+        - internshipEndDate
+        - workingModel
+        - academicApprovalStatus
+        - placementVersion
+      properties:
+        placementId:
+          type: string
+          example: PL-2026-0044
+        studentId:
+          type: string
+          example: STUDENT-1042
+        employerId:
+          type: string
+          example: EMP-0081
+        opportunityId:
+          type: string
+          example: OPP-2026-0045
+        placementOfferId:
+          type: string
+          example: OFFER-2026-0072
+        placementCycleId:
+          type: string
+          example: CYCLE-2026-SUMMER
+        placementStatus:
+          $ref: "#/components/schemas/PlacementStatus"
+        confirmedAt:
+          type: string
+          format: date-time
+        internshipStartDate:
+          type: string
+          format: date
+        internshipEndDate:
+          type: string
+          format: date
+        workingModel:
+          $ref: "#/components/schemas/WorkingModel"
+        city:
+          type: string
+          nullable: true
+        academicApprovalStatus:
+          type: string
+          enum:
+            - not_required
+            - pending
+            - approved
+            - rejected
+        createdBy:
+          type: string
+        cancellationReason:
+          type: string
+          nullable: true
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
+        placementVersion:
+          type: integer
+          minimum: 1
+
+    PlacementPage:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Placement"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    InternshipOutcomeRequest:
+      type: object
+      required:
+        - outcomeStatus
+        - completionDate
+        - academicCreditStatus
+        - overallOutcomeSummary
+      properties:
+        outcomeStatus:
+          $ref: "#/components/schemas/OutcomeStatus"
+        completionDate:
+          type: string
+          format: date
+        academicCreditStatus:
+          $ref: "#/components/schemas/AcademicCreditStatus"
+        studentEvaluationReference:
+          type: string
+          nullable: true
+        employerEvaluationReference:
+          type: string
+          nullable: true
+        academicAssessmentReference:
+          type: string
+          nullable: true
+        overallOutcomeSummary:
+          type: string
+          minLength: 20
+          maxLength: 5000
+
+    InternshipOutcome:
+      type: object
+      required:
+        - internshipOutcomeId
+        - placementId
+        - outcomeStatus
+        - completionDate
+        - academicCreditStatus
+        - overallOutcomeSummary
+        - recordedBy
+        - recordedAt
+      properties:
+        internshipOutcomeId:
+          type: string
+          example: OUT-2026-0036
+        placementId:
+          type: string
+          example: PL-2026-0044
+        outcomeStatus:
+          $ref: "#/components/schemas/OutcomeStatus"
+        completionDate:
+          type: string
+          format: date
+        academicCreditStatus:
+          $ref: "#/components/schemas/AcademicCreditStatus"
+        studentEvaluationStatus:
+          type: string
+          enum:
+            - not_required
+            - pending
+            - submitted
+            - reviewed
+        employerEvaluationStatus:
+          type: string
+          enum:
+            - not_required
+            - pending
+            - submitted
+            - reviewed
+        overallOutcomeSummary:
+          type: string
+        recordedBy:
+          type: string
+        recordedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          minimum: 1
+
+    InterventionCaseCreateRequest:
+      type: object
+      required:
+        - studentId
+        - placementCycleId
+        - interventionReason
+        - priority
+        - deadline
+      properties:
+        studentId:
+          type: string
+        placementCycleId:
+          type: string
+        interventionReason:
+          type: string
+          enum:
+            - no_active_application
+            - no_recommendation
+            - all_applications_rejected
+            - incomplete_profile
+            - eligibility_review_required
+            - restrictive_preferences
+            - no_date_compatible_opportunity
+            - placement_deadline_approaching
+            - confirmed_placement_cancelled
+            - repeated_employer_rejection
+            - other
+        priority:
+          $ref: "#/components/schemas/InterventionPriority"
+        assignedTo:
+          type: string
+          nullable: true
+        deadline:
+          type: string
+          format: date-time
+        initialNotes:
+          type: string
+          maxLength: 3000
+          nullable: true
+
+    InterventionCaseUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        priority:
+          $ref: "#/components/schemas/InterventionPriority"
+        interventionStatus:
+          $ref: "#/components/schemas/InterventionStatus"
+        assignedTo:
+          type: string
+          nullable: true
+        deadline:
+          type: string
+          format: date-time
+        actionSummary:
+          type: string
+          maxLength: 5000
+        resolutionReason:
+          type: string
+          maxLength: 3000
+          nullable: true
+
+    InterventionCase:
+      type: object
+      required:
+        - interventionCaseId
+        - studentId
+        - placementCycleId
+        - interventionReason
+        - priority
+        - interventionStatus
+        - deadline
+        - openedAt
+      properties:
+        interventionCaseId:
+          type: string
+          example: INT-2026-0028
+        studentId:
+          type: string
+          example: STUDENT-1042
+        placementCycleId:
+          type: string
+          example: CYCLE-2026-SUMMER
+        interventionReason:
+          type: string
+        priority:
+          $ref: "#/components/schemas/InterventionPriority"
+        interventionStatus:
+          $ref: "#/components/schemas/InterventionStatus"
+        assignedTo:
+          type: string
+          nullable: true
+        deadline:
+          type: string
+          format: date-time
+        actionSummary:
+          type: string
+          nullable: true
+        resolutionReason:
+          type: string
+          nullable: true
+        openedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        version:
+          type: integer
+          minimum: 1
+
+    InterventionCasePage:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InterventionCase"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    DateRange:
+      type: object
+      required:
+        - startDate
+        - endDate
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+
+    FieldViolation:
+      type: object
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+          example: applicationDeadline
+        message:
+          type: string
+          example: Application deadline must be before the internship start date.
+        rejectedValue:
+          nullable: true
+
+    BusinessRuleViolation:
+      type: object
+      required:
+        - ruleId
+        - ruleVersion
+        - message
+      properties:
+        ruleId:
+          type: string
+          example: BR-CP-002
+        ruleVersion:
+          type: string
+          example: "1.0"
+        message:
+          type: string
+          example: Available opportunity capacity cannot become negative.
+        expectedValue:
+          type: string
+          nullable: true
+        observedValue:
+          type: string
+          nullable: true
+        severity:
+          type: string
+          enum:
+            - blocking
+            - warning
+            - informational
+
+    Problem:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+        - traceId
+      properties:
+        type:
+          type: string
+          format: uri
+          example: https://api.example-university.edu/problems/invalid-request
+        title:
+          type: string
+          example: Invalid request
+        status:
+          type: integer
+          example: 400
+        detail:
+          type: string
+          example: One or more request values are invalid.
+        instance:
+          type: string
+          format: uri
+          nullable: true
+        errorCode:
+          type: string
+          example: INVALID_REQUEST
+        traceId:
+          type: string
+          example: TRACE-62f1ad9c
+        fieldViolations:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldViolation"
+
+    BusinessRuleProblem:
+      allOf:
+        - $ref: "#/components/schemas/Problem"
+        - type: object
+          properties:
+            businessRuleViolations:
+              type: array
+              items:
+                $ref: "#/components/schemas/BusinessRuleViolation"
