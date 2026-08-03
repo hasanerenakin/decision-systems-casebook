@@ -1,232 +1,412 @@
 # Decision Systems Casebook
 
-A continuously growing portfolio of business systems, operational
-decision-support models and solution-design case studies.
+A portfolio repository containing structured business analysis, system design
+and decision-support case studies.
 
-Each case begins with a real-world business problem and develops it into a
-structured, measurable and auditable system design.
+The repository demonstrates how complex operational problems can be translated
+into:
 
-## Portfolio Objective
-
-This repository demonstrates how business and operational problems can be
-translated into:
-
-- Stakeholder requirements
-- Improved business processes
+- Clear problem definitions
+- Stakeholder and decision-right analysis
+- Current-state and future-state workflows
 - Functional and non-functional requirements
 - Business rules
 - Conceptual data models
 - API contracts
+- Decision-support logic
 - KPI frameworks
 - Analytical SQL
-- Risk and control structures
-- Acceptance tests
-- Architectural decisions
+- Risk and control models
+- Test scenarios
+- Architecture decision records
 
-The case studies focus on the connection between business needs, technology,
-data and operational decision-making.
+The cases focus on designing understandable, traceable and human-governed
+systems rather than presenting isolated code examples.
 
-## Case Studies
+## Repository Status
 
-| No. | Case Study | Domain | Status |
+**2 completed case studies**
+
+| No. | Case | Domain | Status |
 |---:|---|---|---|
-| 01 | [Campus Shuttle Decision System](cases/01-campus-shuttle/README.md) | University Transportation | Completed |
-| 02 | Internship Placement and Matching System | Education and Career Services | Planned |
-| 03 | Hotel Overbooking Control System | Hospitality | Planned |
-| 04 | Supplier Risk Evaluation System | Procurement | Planned |
-| 05 | Customer Support Ticket Prioritization System | Customer Operations | Planned |
-| 06 | Event Capacity and Waitlist System | Event Management | Planned |
-| 07 | Equipment Maintenance Scheduling System | Asset Management | Planned |
-| 08 | Scholarship Application Evaluation System | Education | Planned |
-| 09 | Restaurant Queue Management System | Hospitality Operations | Planned |
-| 10 | Employee Shift Planning System | Workforce Management | Planned |
-| 11 | Subscription Retention Decision System | Customer Success | Planned |
-| 12 | Disaster Volunteer Coordination System | Emergency Management | Planned |
+| 01 | [Campus Shuttle Decision-Support System](cases/01-campus-shuttle/) | University Transportation Operations | **Completed** |
+| 02 | [Internship Placement and Matching System](cases/02-internship-placement/) | University Career Services | **Completed** |
 
-## Completed Case: Campus Shuttle Decision System
+## Case 01: Campus Shuttle Decision-Support System
 
-The first case study designs an explainable decision-support system for
-university shuttle operations.
+The first case designs a decision-support system for university shuttle
+operations.
 
-The system analyzes:
+The case addresses challenges such as:
 
-- Vehicle capacity
-- Passenger observations
-- Route utilization
-- Trip delays
-- Service reliability
-- Student feedback
-- Operational recommendations
-- Human approval decisions
+- Uncertain passenger demand
+- Overcrowded or underutilized trips
+- Manual dispatch decisions
+- Limited operational visibility
+- Delayed response to demand changes
+- Inconsistent service-level measurement
 
-The completed case includes:
+The proposed design supports:
 
-- Business problem definition
+- Demand observation
+- Occupancy monitoring
+- Dispatch recommendations
+- Human-approved operational decisions
+- Route and trip analysis
+- KPI reporting
+- Risk controls
+- Decision traceability
+
+The system generates recommendations while preserving the authority of human
+dispatchers.
+
+### Main Deliverables
+
+- Problem brief
 - Stakeholder analysis
-- Functional and non-functional requirements
-- As-is and to-be process models
+- Requirements
+- Current-state process
+- Future-state process
 - Business rules
 - Conceptual data model
 - OpenAPI contract
 - KPI framework
-- Analytical SQL queries
+- Analytical SQL
 - Risk and control framework
-- Acceptance and boundary-value tests
-- Architecture decision record
+- Test scenarios
 - Final case summary
+- Architecture decision record
 
-[View the completed Campus Shuttle Decision System case](cases/01-campus-shuttle/README.md)
+[Open the Campus Shuttle case](cases/01-campus-shuttle/)
 
-## Case Study Structure
+## Case 02: Internship Placement and Matching System
 
-Each case is designed to include the following documents:
+The second case designs an explainable internship placement and matching system
+for a university career center.
 
-| Stage | Deliverable |
-|---|---|
-| 01 | Problem brief |
-| 02 | Stakeholder analysis |
-| 03 | System requirements |
-| 04 | Current process |
-| 05 | Proposed process |
-| 06 | Business rules |
-| 07 | Conceptual data model |
-| 08 | API contract |
-| 09 | KPI framework |
-| 10 | Analytical SQL |
-| 11 | Risk and control framework |
-| 12 | Test scenarios |
-| 13 | Case summary |
-| ADR | Architecture decision records |
+The case addresses challenges such as:
 
-The structure may be adjusted when a case requires different analytical,
-technical or operational components.
+- Fragmented student information
+- Inconsistent academic eligibility checks
+- Unstructured employer requirements
+- Manual candidate comparison
+- Limited application visibility
+- Opportunity-capacity conflicts
+- Unexplained recommendations
+- Informal exception handling
+- Delayed intervention for unplaced students
+- Weak decision traceability
 
-## Skills Demonstrated
+The proposed design supports:
 
-### Business and System Analysis
+- Versioned student profiles
+- Academic eligibility evaluation
+- Authorized academic exceptions
+- Employer verification
+- Structured internship opportunities
+- Mandatory requirement evaluation
+- Multi-dimensional compatibility scoring
+- Separate confidence evaluation
+- Explainable recommendations
+- Human review and controlled overrides
+- Placement offers
+- Temporary capacity reservations
+- Final placement confirmation
+- Internship outcomes
+- Unplaced-student intervention
+- Operational and governance reporting
 
-- Business problem definition
-- Stakeholder analysis
-- Requirements engineering
-- Process improvement
-- Business-rule design
-- Use-case development
-- Acceptance-criteria definition
+The central architectural decision is to separate eligibility from
+compatibility scoring.
 
-### Data and Analytics
+A high compatibility score cannot compensate for:
 
-- Conceptual data modeling
-- SQL analytics
-- KPI development
-- Decision-threshold design
-- Data-quality analysis
-- Before-and-after performance evaluation
+- Academic ineligibility
+- Failed mandatory requirements
+- Missing mandatory evidence
+- Blocking student constraints
+- Invalid employer or opportunity status
 
-### Solution Design
+Recommendations remain advisory and final placement requires authorized human
+review.
 
-- API contract design
-- Human approval workflows
-- Risk and control analysis
-- Auditability
-- Role and permission design
-- Architecture decision documentation
+### Main Deliverables
 
-### Management Information Systems
+- Problem brief
+- Stakeholder and decision-right analysis
+- Functional and non-functional requirements
+- Current-state process
+- Future-state process
+- Detailed business-rule catalog
+- Conceptual data model
+- Matching model
+- OpenAPI contract
+- KPI framework
+- PostgreSQL-oriented analytical SQL
+- Risk and control framework
+- Functional and end-to-end test scenarios
+- Final case summary
+- Architecture decision record
 
-- Connecting business and technology
-- Decision-support system design
-- Operational process analysis
-- Performance measurement
-- Governance and accountability
-- Technical documentation
+[Open the Internship Placement case](cases/02-internship-placement/)
 
-## Design Principles
+## Case Design Method
 
-The case studies follow several common principles.
+Each case follows a consistent analysis and design sequence.
 
-### Explainability
+```mermaid
+flowchart LR
+    A[Problem Definition] --> B[Stakeholder Analysis]
+    B --> C[Requirements]
+    C --> D[Current-State Process]
+    D --> E[Future-State Process]
+    E --> F[Business Rules]
+    F --> G[Data Model]
+    G --> H[API and Decision Logic]
+    H --> I[KPI and Analytics]
+    I --> J[Risk and Controls]
+    J --> K[Test Scenarios]
+    K --> L[Case Summary and ADR]
+```
 
-System outputs and recommendations should include supporting measurements,
-rules and evidence.
+## Decision-Support Principles
 
 ### Human Accountability
 
-High-impact operational decisions should remain attributable to authorized
-decision-makers.
+The designed systems support decisions without automatically replacing
+accountable human roles.
 
-### Traceability
+### Explainability
 
-Requirements, business rules, KPIs, risks and tests should remain connected.
+Recommendations and evaluations retain the rules, indicators, evidence and
+versions that produced them.
 
-### Measurability
+### Separation of Decision States
 
-Proposed improvements should be evaluated using documented performance
-indicators.
+Different decision concepts remain separate.
+
+Examples include:
+
+- Observation and recommendation
+- Eligibility and compatibility
+- Recommendation and approval
+- Offer and confirmed placement
+- Reservation and consumed capacity
+- Internship completion and academic-credit approval
+
+### Historical Traceability
+
+Material decisions preserve:
+
+- Input version
+- Rule version
+- Model version
+- Human decision
+- Override reason
+- Status history
+- Audit evidence
 
 ### Data Quality
 
-Analytical outputs should display limitations caused by missing, invalid or
-low-confidence data.
+Missing, stale, conflicting and unverified information remains visible.
 
-### Auditability
+Missing critical information is not silently treated as a confirmed failure or
+a favorable default.
 
-Important changes and decisions should preserve user, timestamp, reason,
-previous value and new value information.
+### Privacy and Access Control
 
-### Honest Scope
+Users receive only the information necessary for their authorized purpose.
 
-Each case clearly distinguishes between:
+### Measurable Outcomes
 
-- System design
-- Prototype
-- Executable implementation
-- Production deployment
+Every case connects operational workflows with defined KPIs and analytical
+queries.
 
-A design document is not presented as a deployed application.
+### Risk-Based Design
 
-## Repository Status
+High-impact workflows include preventive, detective and corrective controls.
 
-| Metric | Current Value |
-|---|---:|
-| Completed case studies | 1 |
-| Cases in progress | 0 |
-| Planned case studies | 11 |
-| Completed main documents | 14 |
-| Primary repository language | English |
+## Repository Structure
 
-## Development Approach
+```text
+decision-systems-casebook/
+├── README.md
+└── cases/
+    ├── 01-campus-shuttle/
+    │   ├── README.md
+    │   ├── 01-problem-brief.md
+    │   ├── 02-stakeholders.md
+    │   ├── 03-requirements.md
+    │   ├── 04-as-is-process.md
+    │   ├── 05-to-be-process.md
+    │   ├── 06-business-rules.md
+    │   ├── 07-data-model.md
+    │   ├── 08-api-contract.yml
+    │   ├── 09-kpi-framework.md
+    │   ├── 10-analytics.sql
+    │   ├── 11-risk-controls.md
+    │   ├── 12-test-scenarios.md
+    │   ├── 13-case-summary.md
+    │   └── adr/
+    │       └── adr-001-human-approved-recommendations.md
+    │
+    └── 02-internship-placement/
+        ├── README.md
+        ├── 01-problem-brief.md
+        ├── 02-stakeholders.md
+        ├── 03-requirements.md
+        ├── 04-as-is-process.md
+        ├── 05-to-be-process.md
+        ├── 06-business-rules.md
+        ├── 07-data-model.md
+        ├── 08-matching-model.md
+        ├── 09-api-contract.yml
+        ├── 10-kpi-framework.md
+        ├── 11-analytics.sql
+        ├── 12-risk-controls.md
+        ├── 13-test-scenarios.md
+        ├── 14-case-summary.md
+        └── adr/
+            └── adr-001-separate-eligibility-from-scoring.md
+```
 
-Cases are developed incrementally.
+## Skills Demonstrated
 
-Each contribution adds a meaningful component such as:
+### Business Analysis
 
-- A new requirement
-- A process model
-- A business rule
-- A data entity
-- An API operation
-- An analytical query
-- A risk control
-- A test scenario
-- An architectural decision
+- Problem framing
+- Scope definition
+- Stakeholder analysis
+- Decision-right analysis
+- Requirements engineering
+- Process modeling
+- Business-rule specification
+- Acceptance criteria
 
-This approach creates a visible and traceable development history rather than
-a collection of disconnected notes.
+### Systems Analysis
 
-## Next Case
+- Conceptual data modeling
+- Entity and relationship design
+- Status lifecycle design
+- Data-quality requirements
+- Integration design
+- API contract design
+- Traceability
 
-The next planned case is:
+### Decision-Support Design
 
-**Internship Placement and Matching System**
+- Rule-based eligibility
+- Recommendation workflows
+- Compatibility scoring
+- Confidence calculation
+- Explainability
+- Human review
+- Controlled overrides
+- Architecture decision records
 
-The case will examine how universities can match students with internship
-opportunities while considering:
+### Data and Analytics
 
-- Student skills and interests
-- Employer requirements
-- Academic eligibility
-- Location and working-model preferences
-- Application limits
-- Fairness and explainability
-- Placement capacity
-- Human review and override
+- KPI design
+- Funnel analysis
+- Capacity analysis
+- Operational reporting
+- Outcome measurement
+- Analytical SQL
+- Data-quality monitoring
+- Fairness and access indicators
+
+### Risk and Governance
+
+- Risk registers
+- Preventive controls
+- Detective controls
+- Corrective controls
+- Role-based access
+- Segregation of duties
+- Privacy analysis
+- Auditability
+- Recovery planning
+
+### Quality Assurance
+
+- Functional testing
+- Boundary-value testing
+- Authorization testing
+- Business-rule testing
+- Concurrency testing
+- Integration testing
+- End-to-end testing
+- Recovery testing
+
+## Technology and Documentation Formats
+
+The repository uses:
+
+- Markdown
+- Mermaid diagrams
+- YAML
+- OpenAPI 3.0
+- SQL
+- PostgreSQL-oriented analytical syntax
+- Architecture Decision Records
+
+These formats make each case readable, reviewable and suitable for version
+control.
+
+## Portfolio Positioning
+
+The casebook is designed to demonstrate the connection between:
+
+```text
+Business Problem
+→ Process
+→ Requirements
+→ Rules
+→ Data
+→ Services
+→ Decisions
+→ Controls
+→ Measurement
+```
+
+This approach reflects the responsibilities found across roles such as:
+
+- Business Analyst
+- Systems Analyst
+- Business Systems Analyst
+- Product Analyst
+- Operations Analyst
+- Data Analyst
+- Decision-Support Analyst
+- Junior Product Manager
+- Technology and Process Consultant
+
+## Important Note
+
+The cases are design studies.
+
+They do not represent deployed production systems and do not contain real
+student, employer, passenger or institutional data.
+
+All sample:
+
+- Rules
+- Thresholds
+- Weights
+- Service levels
+- Risk scores
+- KPI targets
+- API addresses
+- Identifiers
+
+are illustrative and would require stakeholder, legal, privacy, security and
+technical validation before real implementation.
+
+## Current Progress
+
+- [x] Case 01 — Campus Shuttle Decision-Support System
+- [x] Case 02 — Internship Placement and Matching System
+- [ ] Additional decision-system cases
+
+The repository will continue to expand with cases from different operational
+domains while preserving the same structured analysis and design approach.
