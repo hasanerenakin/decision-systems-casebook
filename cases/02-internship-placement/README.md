@@ -1,569 +1,598 @@
 # Internship Placement and Matching System
 
-## Case Status
+## Status
 
-**In Progress**
+**Completed**
+
+## Case Type
+
+Business Analysis, System Design and Explainable Decision-Support Case Study
+
+## Domain
+
+University Career Services and Internship Operations
 
 ## Overview
 
 This case study designs an explainable internship placement and matching system
 for a university career center.
 
-The proposed system helps students, employers and university staff manage the
-complete internship-placement process.
+The proposed system brings together:
 
-It evaluates:
-
-- Student eligibility
-- Academic program requirements
-- Skills and interests
-- Employer requirements
-- Internship capacity
-- Location preferences
-- Working-model preferences
-- Application limits
-- Previous placements
-- Fairness constraints
+- Student placement profiles
+- Authoritative academic records
+- Academic eligibility rules
+- Employer verification
+- Internship opportunities
+- Structured employer requirements
+- Student applications
+- Compatibility evaluations
+- Explainable recommendations
 - Human review decisions
+- Placement offers
+- Capacity reservations
+- Confirmed placements
+- Internship outcomes
+- Student intervention cases
+- Operational and governance reporting
 
-The system generates ranked placement recommendations but does not make final
-placements automatically.
+The central design principle is that the system supports placement decisions
+without making final placement decisions autonomously.
 
-Authorized career-center staff review the recommendations before confirming a
-student-employer match.
+Academic eligibility, employer requirements, compatibility, confidence,
+capacity and human approval remain separate and traceable.
 
 ## Business Problem
 
-Universities often manage internship applications using spreadsheets, email
-messages, application forms and manual comparisons.
-
-This creates several operational problems:
-
-- Students apply to positions for which they are not academically eligible.
-- Employers receive applications that do not meet their requirements.
-- Career-center staff compare large numbers of applications manually.
-- Student preferences are not evaluated consistently.
-- Internship capacities are difficult to track.
-- Some students receive multiple opportunities while others receive none.
-- Placement decisions may be difficult to explain.
-- Application deadlines and required documents may be missed.
-- Conflicts between university rules and employer conditions may be detected
-  too late.
-- Historical placement outcomes are not used systematically.
-
-## Proposed Solution
-
-The proposed system converts student, employer and internship information into
-structured and explainable placement recommendations.
-
-The general process is:
-
-1. Register students, employers and internship opportunities.
-2. Validate academic and administrative eligibility.
-3. Collect student preferences and employer requirements.
-4. Calculate compatibility indicators.
-5. Remove ineligible student-opportunity combinations.
-6. rank eligible combinations using documented matching rules.
-7. Detect capacity, fairness and conflict conditions.
-8. Present recommendations and supporting evidence to career-center staff.
-9. Record approval, rejection or override decisions.
-10. Monitor placement acceptance and completion outcomes.
-
-## Main Users
-
-### Students
-
-Students use the system to:
-
-- Maintain their profile
-- Enter skills and interests
-- Upload or reference required documents
-- Review internship opportunities
-- Submit ranked preferences
-- Track application status
-- Accept or decline placement offers
-- Report internship outcomes
-
-### Employers
-
-Employers use the system to:
-
-- Maintain company information
-- Publish internship opportunities
-- Define required and preferred qualifications
-- Set capacity and working conditions
-- Review eligible candidates
-- Submit candidate evaluations
-- Confirm accepted placements
-
-### Career Center Staff
-
-Career-center staff use the system to:
-
-- Validate opportunities
-- Review student eligibility
-- Monitor application volume
-- Review matching recommendations
-- Resolve conflicts
-- Apply documented overrides
-- Confirm placements
-- Monitor unplaced students
-- Produce institutional reports
-
-### Academic Departments
-
-Academic departments use the system to:
-
-- Define internship requirements
-- Confirm academic eligibility
-- Review internship relevance
-- Approve exceptional placements
-- Monitor department-level placement outcomes
-
-### University Administration
-
-University administration uses the system to:
-
-- Monitor placement rates
-- Compare departments
-- Evaluate employer participation
-- Review fairness indicators
-- Identify capacity shortages
-- Support policy decisions
-
-## Main Objectives
-
-The system should:
-
-- Reduce manual application comparison
-- Prevent academically invalid placements
-- Improve student-opportunity compatibility
-- Respect employer capacity
-- Preserve student preferences
-- Identify students at risk of remaining unplaced
-- Make recommendations explainable
-- Support fair and auditable placement decisions
-- Track the complete placement lifecycle
-- Measure placement quality and completion outcomes
-
-## Scope
-
-The case covers:
-
-- Student profile management
-- Academic eligibility
-- Employer management
-- Internship-opportunity management
-- Student preferences
-- Employer requirements
-- Candidate screening
-- Compatibility scoring
-- Placement recommendations
-- Human review
-- Capacity management
-- Offer acceptance
-- Placement confirmation
-- Completion monitoring
-- Fairness and risk controls
-- Reporting and analytics
-
-## Out of Scope
-
-The initial design does not include:
-
-- Payroll management
-- Employee contracts
-- Immigration or work-permit processing
-- Automatic legal approval
-- Real-time labor-market forecasting
-- Fully autonomous placement decisions
-- Employer payroll integrations
-- Production identity-verification services
-
-These areas may be referenced as external dependencies when necessary.
-
-## Core Decision Questions
-
-The system should help answer:
-
-- Is the student academically eligible for this internship?
-- Does the student meet the employer's mandatory requirements?
-- How well do the student's skills match the opportunity?
-- Does the opportunity satisfy the student's preferences?
-- Is there remaining employer capacity?
-- Has the student exceeded the application or placement limit?
-- Would the recommendation create an unfair concentration of opportunities?
-- Is a human override required?
-- Which students are at risk of remaining unplaced?
-- Did the final placement result in successful internship completion?
-
-## Matching Dimensions
-
-The proposed matching model considers multiple dimensions.
-
-### Academic Eligibility
-
-Examples include:
-
-- Academic department
-- Current year of study
-- Minimum GPA
-- Required completed courses
-- Internship-credit eligibility
-- Department approval
-- Previous mandatory internship completion
-
-### Student Skills
-
-Examples include:
-
-- Technical skills
-- Business skills
-- Language proficiency
-- Software knowledge
-- Certifications
-- Project experience
-- Communication skills
-
-### Employer Requirements
-
-Requirements may be classified as:
-
-- Mandatory
-- Preferred
-- Optional
-
-A student who does not meet a mandatory requirement may be excluded from the
-eligible candidate pool.
-
-### Student Preferences
-
-Preferences may include:
-
-- Industry
-- Role type
-- City
-- Remote, hybrid or on-site work
-- Internship period
-- Company size
-- Paid or unpaid opportunity
-- Language of work
-- Preferred employers
-- Unacceptable conditions
-
-### Operational Constraints
-
-The matching process must also consider:
-
-- Employer capacity
-- Application deadlines
-- Internship dates
-- Schedule conflicts
-- University application limits
-- Previously accepted offers
-- Department placement quotas
-- Required documentation
-- Employer suspension status
-
-## Recommendation Principles
-
-The matching system follows these principles:
-
-### Eligibility Before Ranking
-
-Ineligible combinations must be removed before compatibility ranking.
-
-A high skill match cannot compensate for a mandatory eligibility failure.
-
-### Mandatory and Preferred Requirements
-
-Mandatory requirements act as exclusion conditions.
-
-Preferred requirements contribute to compatibility but do not automatically
-exclude the student.
-
-### Preference Awareness
-
-Student preferences should influence recommendations.
-
-The system should not treat all eligible opportunities as equally desirable to
-the student.
-
-### Explainability
-
-Every recommendation should show:
-
-- Eligibility result
-- Matching factors
-- Missing preferred qualifications
-- Satisfied mandatory requirements
-- Student preference alignment
-- Employer capacity
-- Final recommendation status
-
-### Human Review
-
-The system recommends placements but does not confirm them automatically.
-
-Authorized staff may:
-
-- Approve a recommendation
-- Reject a recommendation
-- Request additional information
-- Apply an override
-- Place the recommendation on hold
-
-### Auditability
-
-Every important action should preserve:
-
-- Responsible user
-- Timestamp
-- Previous status
-- New status
-- Decision reason
-- Related student
-- Related opportunity
-
-## High-Level Placement Workflow
+Internship placement processes are frequently managed through disconnected
+tools and communication channels such as:
+
+- Email
+- Spreadsheets
+- Online forms
+- Student information systems
+- Employer messages
+- Shared documents
+- Department records
+- Staff notes
+
+This fragmentation may create:
+
+- Repeated collection of student information
+- Inconsistent academic eligibility decisions
+- Unstructured employer requirements
+- Manual candidate comparison
+- Limited application visibility
+- Capacity conflicts
+- Unexplained recommendations
+- Informal exception handling
+- Delayed identification of unplaced students
+- Inconsistent performance reporting
+- Weak historical traceability
+
+## Project Objective
+
+The objective of this case is to design a controlled system that can:
+
+1. Maintain structured and versioned student profiles.
+2. Evaluate academic eligibility consistently.
+3. Support authorized academic exceptions.
+4. Verify employers before opportunity publication.
+5. Structure mandatory, preferred and optional requirements.
+6. Validate applications before processing.
+7. Compare valid student-opportunity combinations.
+8. Generate explainable placement recommendations.
+9. Preserve authorized human decision-making.
+10. Prevent capacity over-allocation.
+11. Prevent conflicting confirmed placements.
+12. Identify students requiring intervention.
+13. Connect recommendations with placement outcomes.
+14. Support reliable operational and governance reporting.
+15. Protect personal and sensitive information.
+
+## Main Stakeholders
+
+| Stakeholder | Primary Need |
+|---|---|
+| Students | Clear eligibility, relevant opportunities and transparent status |
+| Employers | Structured opportunities and suitable candidates |
+| Career-Center Specialists | One controlled operational workflow |
+| Career-Center Manager | Placement-cycle performance and risk visibility |
+| Academic Advisors | Consistent eligibility and exception handling |
+| Department Coordinators | Academic suitability and placement oversight |
+| University Administration | Reliable institutional reporting |
+| IT Team | Maintainable services and controlled integrations |
+| Privacy Team | Purpose-based processing and data minimization |
+| Information Security | Authentication, authorization and monitoring |
+| Internal Audit | Traceable rules, decisions and overrides |
+
+## Proposed Decision Flow
 
 ```mermaid
 flowchart TD
-    A[Student profile completed] --> B[Academic eligibility validation]
-    C[Employer opportunity published] --> D[Opportunity review]
+    A[Student Profile] --> B[Academic Eligibility]
+    B --> C{Eligible?}
 
-    B --> E{Student eligible?}
-    D --> F{Opportunity approved?}
+    C -- No --> D[Explain Exclusion or Start Review]
+    C -- Data Incomplete --> E[Request Information]
+    C -- Yes --> F[Application Validation]
 
-    E -- No --> G[Record ineligibility reasons]
-    F -- No --> H[Return opportunity for correction]
+    F --> G[Mandatory Requirement Evaluation]
+    G --> H{Mandatory Requirements Passed?}
 
-    E -- Yes --> I[Build eligible student profile]
-    F -- Yes --> J[Open opportunity for applications]
+    H -- No --> I[Explain Requirement Failure]
+    H -- Evidence Missing --> J[Request Evidence]
+    H -- Yes --> K[Student Hard Constraint Check]
 
-    I --> K[Collect student preferences]
-    J --> L[Collect applications]
+    K --> L{Blocking Conflict?}
+    L -- Yes --> M[Mark Combination Incompatible]
+    L -- No --> N[Compatibility Evaluation]
 
-    K --> M[Evaluate student-opportunity combinations]
-    L --> M
-
-    M --> N[Apply mandatory requirements]
-    N --> O{Combination eligible?}
-
-    O -- No --> P[Record exclusion reasons]
-    O -- Yes --> Q[Calculate compatibility indicators]
-
-    Q --> R[Check capacity and fairness constraints]
-    R --> S[Generate ranked recommendations]
-    S --> T[Career-center review]
-
-    T --> U{Decision}
-    U -- Approve --> V[Create placement offer]
-    U -- Reject --> W[Record rejection reason]
-    U -- Override --> X[Record override justification]
-    U -- More information --> Y[Return for review]
-
-    V --> Z{Student accepts?}
-    Z -- Yes --> AA[Confirm placement]
-    Z -- No --> AB[Release capacity and continue matching]
-
-    AA --> AC[Monitor internship completion]
-    AC --> AD[Evaluate placement outcome]
+    N --> O[Confidence Evaluation]
+    O --> P[Capacity and Conflict Check]
+    P --> Q[Explainable Recommendation]
+    Q --> R[Authorized Human Review]
+    R --> S[Placement Offer]
+    S --> T[Temporary Capacity Reservation]
+    T --> U[Student and Employer Responses]
+    U --> V[Final Placement Confirmation]
+    V --> W[Internship Outcome]
 ```
 
-## Planned Case Documents
+## Core Design Principles
 
-| No. | Document | Purpose |
-|---:|---|---|
-| 01 | `01-problem-brief.md` | Define the placement problem and institutional impact |
-| 02 | `02-stakeholders.md` | Analyze students, employers, departments and career-center roles |
-| 03 | `03-requirements.md` | Document functional and non-functional requirements |
-| 04 | `04-as-is-process.md` | Model the current manual application and placement process |
-| 05 | `05-to-be-process.md` | Design the proposed placement workflow |
-| 06 | `06-business-rules.md` | Define eligibility, capacity, ranking and override rules |
-| 07 | `07-data-model.md` | Model students, opportunities, applications and placements |
-| 08 | `08-matching-model.md` | Define compatibility dimensions and recommendation logic |
-| 09 | `09-api-contract.yml` | Design student, opportunity and placement API operations |
-| 10 | `10-kpi-framework.md` | Define placement, fairness and operational KPIs |
-| 11 | `11-analytics.sql` | Add application, matching and placement analysis queries |
-| 12 | `12-risk-controls.md` | Define fairness, privacy, data and decision controls |
-| 13 | `13-test-scenarios.md` | Document functional, boundary and matching tests |
-| 14 | `14-case-summary.md` | Summarize the completed case and demonstrated skills |
-| ADR-001 | `adr/adr-001-human-reviewed-placement.md` | Record the human-review decision |
-| ADR-002 | `adr/adr-002-rule-based-explainability.md` | Record the explainable matching approach |
+### Eligibility Before Scoring
 
-## Planned Data Entities
+Academic eligibility and mandatory employer requirements act as gates.
 
-The case is expected to include:
+A high compatibility score cannot compensate for:
+
+- Academic ineligibility
+- Failed mandatory requirement
+- Missing mandatory evidence
+- Invalid employer status
+- Invalid opportunity
+- Blocking placement conflict
+
+### Compatibility Is Advisory
+
+Compatibility evaluates how well an eligible student aligns with an
+opportunity.
+
+It does not represent:
+
+- General student quality
+- Guaranteed internship success
+- Employer acceptance
+- Academic approval
+- Final placement confirmation
+
+### Confidence Is Separate
+
+The system displays compatibility and confidence independently.
+
+Example:
+
+```text
+Compatibility score: 88
+Confidence level: 57
+```
+
+This means the available information indicates strong alignment, but additional
+verification may be required.
+
+### Human Review Is Required
+
+Recommendations remain advisory.
+
+Authorized reviewers may:
+
+- Approve
+- Reject
+- Request additional information
+- Place a recommendation on hold
+- Escalate a case
+- Apply an authorized override
+
+The original system recommendation remains preserved.
+
+### Capacity Is Transactionally Controlled
+
+Applications and recommendations do not consume opportunity capacity.
+
+An approved placement offer may create a temporary reservation.
+
+A confirmed placement consumes capacity.
+
+```text
+Available Capacity =
+Total Capacity
+- Confirmed Placements
+- Active Reservations
+```
+
+Available capacity must never become negative.
+
+### Historical Decisions Are Preserved
+
+Important records retain:
+
+- Academic rule version
+- Opportunity requirement version
+- Student profile version
+- Student preference version
+- Matching-model version
+- Human decision version
+- Offer version
+- Placement status history
+
+## Matching Dimensions
+
+The illustrative matching model evaluates nine dimensions.
+
+| Dimension | Default Weight |
+|---|---:|
+| Skill Compatibility | 25% |
+| Academic Relevance | 15% |
+| Preferred Requirement Satisfaction | 15% |
+| Role Preference Alignment | 10% |
+| Industry Preference Alignment | 10% |
+| Location Compatibility | 8% |
+| Working-Model Compatibility | 7% |
+| Internship-Period Compatibility | 5% |
+| Language Compatibility | 5% |
+| **Total** | **100%** |
+
+These weights are proposed case-study values and require stakeholder validation
+before institutional use.
+
+## Recommendation Output
+
+An explainable recommendation may contain:
+
+- Academic eligibility result
+- Mandatory requirement results
+- Compatibility indicators
+- Overall compatibility score
+- Confidence level
+- Student preference alignment
+- Capacity status
+- Conflict status
+- Data-quality warnings
+- Recommendation rank
+- Rule-set version
+- Matching-model version
+- Human-readable explanation
+
+Example:
+
+```yaml
+recommendation_status: recommended
+compatibility_score: 90.50
+confidence_level: 94
+mandatory_requirements_passed: true
+hard_constraint_conflict: false
+capacity_status: available
+human_review_required: true
+```
+
+## Main Entities
+
+The conceptual data model includes:
+
+### Student and Academic Entities
 
 - Student
+- Student Profile
+- Student Academic Record
 - Academic Program
 - Student Skill
 - Student Preference
+- Student Document
+- Placement Cycle
+
+### Employer and Opportunity Entities
+
 - Employer
+- Employer Representative
 - Internship Opportunity
 - Opportunity Requirement
-- Application
-- Eligibility Evaluation
-- Match Evaluation
-- Recommendation
-- Recommendation Evidence
-- Placement Offer
-- Placement
-- Placement Decision
-- Internship Outcome
 - Document Requirement
+
+### Evaluation and Recommendation Entities
+
+- Academic Eligibility Evaluation
+- Eligibility Rule Result
+- Academic Exception Request
+- Requirement Evaluation
+- Match Evaluation
+- Match Indicator
+- Placement Recommendation
+- Recommendation Evidence
+
+### Decision and Placement Entities
+
+- Placement Decision
+- Manual Override
+- Placement Offer
+- Capacity Reservation
+- Placement
+- Placement Status History
+- Placement Cancellation
+- Internship Outcome
+
+### Operations and Governance Entities
+
+- Intervention Case
 - Audit Event
+- Rule Configuration Version
 
-## Planned Business Rules
+## API Scope
 
-The case will define rules for:
+The OpenAPI contract covers operations for:
 
+- Student profiles, skills and preferences
+- Academic eligibility evaluations
+- Academic exception requests
+- Employer registration and status decisions
+- Opportunity and requirement management
+- Application submission and withdrawal
+- Requirement evaluations
+- Compatibility calculations
+- Recommendation generation
+- Human decisions and overrides
+- Placement offers
+- Student and employer responses
+- Capacity reservations
+- Final placements
+- Placement cancellations
+- Internship outcomes
+- Intervention cases
+
+The API design also includes:
+
+- Idempotency support
+- Optimistic concurrency
+- Controlled status values
+- Structured business-rule errors
+- Pagination
+- Resource versioning
+- Authorization boundaries
+
+## KPI Categories
+
+The case defines measurable indicators for:
+
+- Student participation
+- Profile readiness
 - Academic eligibility
-- Minimum GPA
-- Required course completion
-- Mandatory employer qualifications
-- Preferred qualifications
-- Application limits
-- Employer capacity
-- Internship-date conflicts
-- Duplicate placements
-- Student preference handling
-- Offer expiration
-- Placement confirmation
-- Human override
-- Recommendation explanation
-- Unplaced-student prioritization
+- Opportunity supply
+- Application activity
+- Mandatory requirement performance
+- Compatibility and confidence
+- Recommendation generation
+- Offer conversion
+- Student placement
+- Capacity utilization
+- Employer participation
+- Internship completion
+- Student intervention
+- Manual overrides
+- Fairness and access
+- Data quality
+- Auditability
+- System reliability
 
-## Planned KPIs
+Examples include:
 
-The case will evaluate indicators such as:
-
-### Placement Outcomes
-
-- Student Placement Rate
-- Unplaced Student Rate
+- Profile Completion Rate
+- Academic Eligibility Rate
+- Opportunity-to-Eligible-Student Ratio
+- Application Submission Rate
+- Mandatory Requirement Pass Rate
+- Students With No Recommendation Rate
+- Recommendation Approval Rate
 - Offer Acceptance Rate
-- Internship Completion Rate
+- Student Placement Rate
+- Capacity Utilization Rate
 - Successful Completion Rate
-
-### Matching Quality
-
-- Mandatory Requirement Satisfaction Rate
-- Average Compatibility Score
-- First-Preference Placement Rate
-- Employer Candidate Acceptance Rate
-- Placement Rejection Rate
-
-### Operational Efficiency
-
-- Average Time to Placement
-- Application Review Time
-- Pending Decision Age
-- Opportunity Fill Rate
-- Employer Capacity Utilization
-
-### Fairness and Access
-
-- Placement Rate by Academic Department
-- Placement Rate by Student Year
-- Opportunity Distribution Rate
-- Students With No Recommendation
-- Override Rate
+- Manual Override Rate
 - Recommendation Concentration Rate
+- Audit Event Completeness Rate
 
-Fairness indicators are intended to support review and investigation.
+## Key Risks
 
-They should not be interpreted as proof of discrimination without additional
-context and analysis.
-
-## Main Risks
-
-The case will examine risks including:
+The risk framework covers:
 
 - Incorrect academic eligibility
-- Missing student information
-- Outdated employer requirements
-- Unfair recommendation outcomes
-- Excessive reliance on numerical scores
-- Manipulation of student profiles
-- Unauthorized access to personal information
-- Employer-capacity errors
-- Duplicate placement offers
-- Unexplained manual overrides
-- Students remaining unplaced
-- Historical bias in matching rules
-- Schedule and location conflicts
-- Expired opportunities remaining active
-- Decisions made without sufficient evidence
+- Missing or stale academic data
+- Unauthorized academic exceptions
+- Unverified employers
+- Invalid opportunities
+- Incorrect requirement evaluation
+- Unexplained recommendations
+- Excessive reliance on scores
+- Recommendation concentration
+- Sensitive information used in matching
+- Capacity over-allocation
+- Expired reservations
+- Conflicting placements
+- Unauthorized overrides
+- Excessive employer data access
+- Bulk exports
+- Integration failures
+- Notification failures
+- Unplaced students
+- Overwritten decision history
+- Inconsistent KPI definitions
+- Small-group privacy exposure
+- Recovery failure
 
-## Human Review Model
+## Key Controls
 
-The system does not automatically confirm a placement.
+Important controls include:
 
-Human review is required because:
+- Versioned academic rules
+- Authoritative academic data
+- Employer verification
+- Opportunity approval
+- Structured requirements
+- Application uniqueness
+- Eligibility before scoring
+- Explainable recommendation evidence
+- Mandatory human review
+- Override authorization
+- Secondary approval
+- Atomic capacity reservation
+- Placement date-overlap validation
+- Purpose-based access
+- Small-group report suppression
+- Immutable audit events
+- Intervention alerts
+- Backup and recovery reconciliation
 
-- Student circumstances may not be fully represented in structured data.
-- Employer requirements may require interpretation.
-- Academic departments may approve documented exceptions.
-- Accessibility or personal constraints may require special consideration.
-- Matching scores may hide important qualitative differences.
-- Capacity and timing information may change.
-- Fairness concerns may require broader institutional review.
+## Testing Coverage
 
-Any manual override must include:
+The test strategy includes:
 
-- Responsible reviewer
-- Override reason
-- Affected student
-- Affected opportunity
-- Previous recommendation
-- Final decision
-- Timestamp
-- Supporting evidence
+- Normal workflow tests
+- Boundary-value tests
+- Eligibility tests
+- Academic exception tests
+- Authorization tests
+- Employer-isolation tests
+- Requirement evaluation tests
+- Compatibility calculation tests
+- Confidence tests
+- Explanation tests
+- Override tests
+- Capacity concurrency tests
+- Offer lifecycle tests
+- Placement conflict tests
+- Privacy tests
+- Integration retry tests
+- KPI calculation tests
+- Recovery tests
+- End-to-end placement scenarios
+- Negative and abuse tests
 
-## Expected Skills Demonstrated
+## Case Deliverables
 
-This case is intended to demonstrate:
+| File | Description |
+|---|---|
+| [`01-problem-brief.md`](01-problem-brief.md) | Defines the business problem, objectives, scope and constraints |
+| [`02-stakeholders.md`](02-stakeholders.md) | Analyzes stakeholder goals, authority, responsibilities and conflicts |
+| [`03-requirements.md`](03-requirements.md) | Defines functional, non-functional, integration and governance requirements |
+| [`04-as-is-process.md`](04-as-is-process.md) | Maps the current manual internship placement process |
+| [`05-to-be-process.md`](05-to-be-process.md) | Designs the proposed future-state workflow |
+| [`06-business-rules.md`](06-business-rules.md) | Defines eligibility, matching, capacity, placement and governance rules |
+| [`07-data-model.md`](07-data-model.md) | Defines the conceptual entities, fields and relationships |
+| [`08-matching-model.md`](08-matching-model.md) | Defines matching gates, indicators, formulas and explainability |
+| [`09-api-contract.yml`](09-api-contract.yml) | Provides the OpenAPI contract for the proposed services |
+| [`10-kpi-framework.md`](10-kpi-framework.md) | Defines operational, outcome and governance KPIs |
+| [`11-analytics.sql`](11-analytics.sql) | Provides a PostgreSQL-oriented analytical SQL library |
+| [`12-risk-controls.md`](12-risk-controls.md) | Defines risks, controls, ownership and monitoring |
+| [`13-test-scenarios.md`](13-test-scenarios.md) | Defines functional, control and end-to-end test scenarios |
+| [`14-case-summary.md`](14-case-summary.md) | Summarizes the complete case and its expected value |
+| [`ADR-001`](adr/adr-001-separate-eligibility-from-scoring.md) | Records the decision to separate eligibility from compatibility scoring |
+
+## Expected Business Value
+
+### Students
+
+- Clearer eligibility results
+- Better application visibility
+- More relevant recommendations
+- Understandable decision explanations
+- Earlier support before deadlines
+
+### Employers
+
+- Structured opportunity definitions
+- More suitable candidate submissions
+- Accurate capacity information
+- Controlled access to candidate information
+- Clear offer and placement status
+
+### Career-Center Staff
+
+- Reduced repetitive administration
+- Consistent workflows
+- Better review prioritization
+- Explainable recommendations
+- Reliable intervention alerts
+- Improved reporting
+
+### Academic Units
+
+- Versioned eligibility rules
+- Controlled academic exceptions
+- Clear decision authority
+- Traceable academic approvals
+- Better outcome visibility
+
+### University Management
+
+- Placement-cycle scorecards
+- Employer-performance monitoring
+- Capacity visibility
+- Governance and override reporting
+- Fairness and access indicators
+- Auditable placement decisions
+
+## Limitations
+
+This repository contains a system-design case study.
+
+It does not include:
+
+- A deployed application
+- A physical production database
+- Real student or employer data
+- Live university integrations
+- A trained machine-learning model
+- Production infrastructure
+- Institution-approved matching weights
+- Jurisdiction-specific legal validation
+
+All thresholds, weights and service targets are illustrative and require
+stakeholder validation before real implementation.
+
+## Skills Demonstrated
 
 - Business analysis
+- Stakeholder analysis
 - Requirements engineering
-- Education operations analysis
-- Career-services process design
-- Eligibility-rule design
-- Matching-system design
+- Process modeling
+- Business-rule design
 - Conceptual data modeling
-- API contract design
+- Decision-support design
+- Explainable scoring
+- API design
 - SQL analytics
 - KPI development
-- Fairness-aware system analysis
-- Privacy and access-control analysis
-- Acceptance testing
-- Architecture decision documentation
-- Technical writing
+- Risk assessment
+- Privacy and security analysis
+- Control design
+- Test planning
+- Architecture decision records
 
-## Current Progress
+## Final Design Statement
 
-| Component | Status |
-|---|---|
-| Case overview | Completed |
-| Problem brief | Planned |
-| Stakeholder analysis | Planned |
-| Requirements | Planned |
-| Current process | Planned |
-| Proposed process | Planned |
-| Business rules | Planned |
-| Data model | Planned |
-| Matching model | Planned |
-| API contract | Planned |
-| KPI framework | Planned |
-| Analytical SQL | Planned |
-| Risk and controls | Planned |
-| Test scenarios | Planned |
-| Architecture decisions | Planned |
-| Final summary | Planned |
+The Internship Placement and Matching System is designed as a controlled
+decision-support platform rather than an autonomous placement engine.
 
-## Next Step
+The design separates:
 
-The next document will define the current internship-placement problem,
-operational challenges, institutional impact and measurable target outcomes.
+- Eligibility from compatibility
+- Mandatory requirements from preferences
+- Compatibility from confidence
+- Recommendations from human decisions
+- Offers from confirmed placements
+- Reservations from consumed capacity
+- Internship completion from academic-credit approval
+- Fairness indicators from automatic conclusions
+
+This separation improves consistency, explainability, accountability,
+auditability and operational control throughout the internship placement
+lifecycle.
